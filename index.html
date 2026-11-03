@@ -1,600 +1,646 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Elsewhere — Personal Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elsewhere</title>
 
 <style>
 :root {
-    --bg: #101a19;
-    --panel: rgba(35, 53, 47, .66);
-    --panel-hover: rgba(48, 70, 60, .8);
-    --border: rgba(190, 220, 197, .14);
-    --text: #e5eee5;
-    --muted: #9aafa1;
-    --accent: #b2d1b5;
-    --accent2: #d3b9d9;
+    --bg: #11121d;
+    --text: #f3f0f7;
+    --muted: #b5b0c5;
+    --accent: #d7c4f4;
+    --border: rgba(255,255,255,.2);
+    --glass: rgba(255,255,255,.105);
+    --glass-hover: rgba(255,255,255,.16);
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
     min-height: 100vh;
-    padding: 35px;
-    background:
-        radial-gradient(ellipse at 15% 10%, #243c32 0%, transparent 45%),
-        radial-gradient(ellipse at 90% 85%, #25313b 0%, transparent 45%),
-        var(--bg);
     color: var(--text);
-    font-family: "SF Pro Display", "Segoe UI", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "Helvetica Neue", sans-serif;
+    background:
+        radial-gradient(ellipse at 12% 15%, rgba(93,105,183,.48), transparent 42%),
+        radial-gradient(ellipse at 82% 8%, rgba(177,112,169,.36), transparent 40%),
+        radial-gradient(ellipse at 75% 85%, rgba(224,133,111,.32), transparent 42%),
+        radial-gradient(ellipse at 20% 90%, rgba(72,111,147,.35), transparent 42%),
+        #11121d;
+    background-attachment: fixed;
+    overflow-x: hidden;
 }
 
+/* Soft Sequoia-like flowing colour shapes */
 body::before {
     content: "";
     position: fixed;
-    inset: 0;
+    inset: -20%;
+    z-index: -1;
     pointer-events: none;
-    background-image:
-        linear-gradient(rgba(200,230,205,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(200,230,205,.025) 1px, transparent 1px);
-    background-size: 48px 48px;
+    background:
+        radial-gradient(ellipse at 35% 30%, rgba(181,160,232,.16), transparent 35%),
+        radial-gradient(ellipse at 70% 50%, rgba(244,174,164,.14), transparent 36%);
+    filter: blur(35px);
+    animation: atmosphere 18s ease-in-out infinite alternate;
 }
 
-main {
-    max-width: 1100px;
-    margin: auto;
-    position: relative;
+@keyframes atmosphere {
+    from { transform: translate(-2%, -1%) scale(1); }
+    to { transform: translate(2%, 2%) scale(1.08); }
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+        135deg,
+        rgba(255,255,255,.035),
+        transparent 35%,
+        rgba(255,255,255,.025)
+    );
+}
+
+button, input, textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.container {
+    width: min(1100px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 55px 0 75px;
 }
 
 header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 19px;
-    margin-bottom: 36px;
-}
-
-.logo {
-    font-size: 17px;
-    letter-spacing: 5px;
-    font-weight: 650;
-}
-
-.logo span { color: var(--accent); }
-
-.header-right {
-    color: var(--muted);
-    font-size: 11px;
-    letter-spacing: 1.5px;
-}
-
-.hero {
-    display: flex;
     justify-content: space-between;
-    align-items: end;
-    margin-bottom: 30px;
+    gap: 20px;
+    margin-bottom: 38px;
 }
 
-h1 {
-    font-size: clamp(32px, 5vw, 48px);
-    font-weight: 400;
-    letter-spacing: -2px;
-    margin: 8px 0;
-}
-
-.subtitle {
-    color: var(--muted);
-    font-size: 12px;
+.brand {
+    font-size: 15px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.75);
+    font-weight: 600;
 }
 
 .clock {
-    color: var(--accent);
-    font-size: 32px;
-    font-weight: 300;
-    font-variant-numeric: tabular-nums;
-}
-
-.date {
     text-align: right;
-    margin-top: 5px;
 }
 
-.panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 15px;
-    padding: 22px;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 12px 35px rgba(0,0,0,.12);
-    min-width: 0;
-    transition: background .2s, border-color .2s;
+#time {
+    font-size: 25px;
+    font-weight: 500;
+    letter-spacing: -.7px;
 }
 
-.panel:hover {
-    background: var(--panel-hover);
-    border-color: rgba(190,220,197,.25);
-}
-
-.section-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 19px;
-}
-
-.section-title {
-    font-size: 11px;
-    font-weight: 650;
-    letter-spacing: 2px;
-    color: var(--accent);
-}
-
-.section-number {
+#date {
     color: var(--muted);
-    font-size: 10px;
-}
-
-.search-panel {
-    margin-bottom: 19px;
-}
-
-.search-row {
-    display: flex;
-    gap: 10px;
-}
-
-input, textarea {
-    width: 100%;
-    padding: 12px;
-    color: var(--text);
-    background: rgba(10,20,17,.55);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    outline: none;
-    font-family: inherit;
-    font-size: 13px;
-}
-
-input:focus, textarea:focus {
-    border-color: var(--accent);
-}
-
-button {
-    color: var(--accent);
-    background: rgba(178,209,181,.09);
-    border: 1px solid var(--border);
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-family: inherit;
     font-size: 12px;
-    cursor: pointer;
-    transition: .2s;
+    margin-top: 3px;
 }
 
-button:hover {
-    background: rgba(178,209,181,.2);
-    border-color: var(--accent);
+.intro {
+    margin-bottom: 34px;
+}
+
+#greeting {
+    font-size: clamp(34px, 6vw, 54px);
+    font-weight: 550;
+    letter-spacing: -2px;
+    margin: 0 0 8px;
+}
+
+#subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    margin: 0;
+}
+
+.search-wrap {
+    margin-bottom: 30px;
+}
+
+.search {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px 8px 19px;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(35px) saturate(150%);
+    -webkit-backdrop-filter: blur(35px) saturate(150%);
+    box-shadow: 0 12px 40px rgba(0,0,0,.13),
+                inset 0 1px rgba(255,255,255,.15);
+}
+
+.search input {
+    flex: 1;
+    min-width: 0;
+    color: white;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    padding: 10px 0;
+    font-size: 15px;
+}
+
+.search input::placeholder {
+    color: rgba(255,255,255,.58);
+}
+
+.search button,
+.add-button {
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.16);
+    color: white;
+    border-radius: 11px;
+    padding: 10px 16px;
+    transition: .2s ease;
+}
+
+.search button:hover,
+.add-button:hover {
+    background: rgba(255,255,255,.25);
 }
 
 .grid {
     display: grid;
     grid-template-columns: 1.15fr .85fr;
-    gap: 19px;
+    gap: 20px;
 }
 
-.full { grid-column: 1 / -1; }
+.panel {
+    border: 1px solid rgba(255,255,255,.19);
+    border-radius: 22px;
+    padding: 23px;
+    background: rgba(255,255,255,.105);
+    backdrop-filter: blur(35px) saturate(155%);
+    -webkit-backdrop-filter: blur(35px) saturate(155%);
+    box-shadow:
+        0 18px 50px rgba(0,0,0,.16),
+        inset 0 1px rgba(255,255,255,.16);
+    transition: background .25s ease, transform .25s ease;
+}
 
-.sites {
+.panel:hover {
+    background: rgba(255,255,255,.13);
+}
+
+.panel h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 18px;
+    letter-spacing: -.2px;
+}
+
+.bookmarks {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 11px;
 }
 
-.site {
-    min-width: 0;
-    position: relative;
+.bookmark {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 9px;
-    min-height: 105px;
-    padding: 14px 7px;
-    color: var(--text);
+    gap: 11px;
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 14px;
+    color: white;
     text-decoration: none;
-    background: rgba(255,255,255,.025);
-    border: 1px solid var(--border);
-    border-radius: 11px;
-    transition: .2s;
+    background: rgba(255,255,255,.075);
+    transition: .2s ease;
 }
 
-.site:hover {
-    background: rgba(178,209,181,.12);
-    transform: translateY(-3px);
+.bookmark:hover {
+    background: rgba(255,255,255,.17);
+    transform: translateY(-2px);
 }
 
-.site-icon {
-    font-size: 25px;
+.bookmark-icon {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: rgba(255,255,255,.15);
+    font-size: 15px;
 }
 
-.site-name {
-    font-size: 12px;
-    text-align: center;
-    overflow-wrap: anywhere;
+.bookmark-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 13px;
 }
 
-.site-remove {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    padding: 2px 6px;
-    opacity: 0;
-    font-size: 11px;
-    border: none;
-    background: rgba(0,0,0,.3);
+.delete-site {
+    margin-left: auto;
+    border: 0;
+    color: rgba(255,255,255,.5);
+    background: transparent;
+    padding: 3px;
+    font-size: 15px;
 }
 
-.site:hover .site-remove { opacity: 1; }
+.delete-site:hover {
+    color: white;
+}
 
 .add-site {
-    margin-top: 14px;
-    width: 100%;
-}
-
-#siteForm {
-    display: none;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 8px;
-    margin-top: 13px;
-}
-
-#siteForm.visible { display: grid; }
-
-textarea {
-    min-height: 180px;
-    resize: vertical;
-    line-height: 1.8;
-}
-
-.save-status {
-    margin-top: 10px;
-    color: var(--muted);
-    font-size: 10px;
-}
-
-.task-entry {
     display: flex;
     gap: 8px;
-    margin-bottom: 15px;
+    margin-top: 15px;
 }
 
-.task-list {
+.add-site input,
+.task-input {
+    min-width: 0;
+    flex: 1;
+    padding: 10px 12px;
+    color: white;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 11px;
+    outline: 0;
+    background: rgba(0,0,0,.12);
+}
+
+.add-site input::placeholder,
+.task-input::placeholder {
+    color: rgba(255,255,255,.45);
+}
+
+.add-site input:focus,
+.task-input:focus,
+textarea:focus {
+    border-color: rgba(218,200,255,.65);
+}
+
+.task-input {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.tasks {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 9px;
 }
 
 .task {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
+    padding: 10px 11px;
+    border-radius: 11px;
+    background: rgba(255,255,255,.075);
     font-size: 13px;
 }
 
 .task input {
-    width: 15px;
-    height: 15px;
-    accent-color: #b2d1b5;
+    accent-color: #c9b5ef;
 }
 
-.task span { flex: 1; }
+.task span {
+    flex: 1;
+    overflow-wrap: anywhere;
+}
 
 .task.done span {
-    color: var(--muted);
+    opacity: .45;
     text-decoration: line-through;
 }
 
-.task button {
-    padding: 3px 8px;
-    border: none;
-    opacity: .6;
+.task-delete {
+    border: 0;
+    background: transparent;
+    color: rgba(255,255,255,.45);
+    font-size: 16px;
 }
 
-.empty {
+.task-delete:hover {
+    color: white;
+}
+
+.notes-panel {
+    grid-column: 1 / -1;
+}
+
+textarea {
+    width: 100%;
+    min-height: 145px;
+    resize: vertical;
+    padding: 14px;
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 13px;
+    outline: 0;
+    background: rgba(0,0,0,.10);
+}
+
+textarea::placeholder {
+    color: rgba(255,255,255,.45);
+}
+
+.note-status {
     color: var(--muted);
-    font-size: 12px;
-    padding: 8px 0;
+    font-size: 11px;
+    margin-top: 9px;
+    text-align: right;
 }
 
 footer {
     text-align: center;
-    color: #81958a;
-    font-size: 10px;
-    letter-spacing: 2px;
-    padding: 32px 0 10px;
+    color: rgba(255,255,255,.4);
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-top: 35px;
 }
 
-/* LITTLE SPIRIT */
-
+/* Little Spirit */
 #spirit {
     position: fixed;
-    left: 70%;
-    top: 25%;
-    width: 65px;
-    height: 72px;
+    right: 28px;
+    bottom: 22px;
+    width: 70px;
+    height: 78px;
     z-index: 10;
     pointer-events: none;
-    transition:
-        left 5s cubic-bezier(.35,.05,.45,1),
-        top 5s cubic-bezier(.35,.05,.45,1);
-    filter: drop-shadow(0 5px 12px rgba(155,220,190,.2));
+    animation: spirit-float 4s ease-in-out infinite;
+    filter: drop-shadow(0 8px 15px rgba(0,0,0,.2));
 }
 
-#spirit .spirit-art {
-    display: block;
+#spirit svg {
     width: 100%;
     height: 100%;
     overflow: visible;
-    animation: float 4s ease-in-out infinite;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-7px); }
+@keyframes spirit-float {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-9px) rotate(2deg); }
 }
 
-.accessory {
-    transform-origin: 70px 20px;
-    animation: grow-in 1.1s ease both;
-}
-
-@keyframes grow-in {
-    from {
-        opacity: 0;
-        transform: translateY(7px) scale(.75);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-#spirit-status {
-    color: var(--muted);
+.spirit-status {
+    position: fixed;
+    right: 108px;
+    bottom: 34px;
+    z-index: 10;
+    color: rgba(255,255,255,.65);
     font-size: 10px;
+    letter-spacing: .5px;
+    pointer-events: none;
 }
 
-@media(max-width: 700px) {
-    body { padding: 18px; }
-    .grid { grid-template-columns: 1fr; }
-    .full { grid-column: 1; }
-    .sites { grid-template-columns: repeat(2,1fr); }
-    .hero { align-items: start; }
-    .clock { font-size: 24px; }
-    #siteForm { grid-template-columns: 1fr; }
-    #spirit { width: 52px; height: 58px; }
+@media (max-width: 720px) {
+    .container {
+        padding-top: 30px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .notes-panel {
+        grid-column: auto;
+    }
+
+    header {
+        margin-bottom: 30px;
+    }
+
+    #spirit {
+        width: 54px;
+        height: 60px;
+        right: 15px;
+        bottom: 15px;
+    }
+
+    .spirit-status {
+        right: 78px;
+        bottom: 27px;
+    }
+}
+
+@media (max-width: 420px) {
+    .bookmarks {
+        grid-template-columns: 1fr;
+    }
+
+    .add-site {
+        flex-wrap: wrap;
+    }
 }
 </style>
 </head>
 
 <body>
+<div class="container">
 
-<!-- THE LITTLE SPIRIT -->
-<div id="spirit">
-<svg class="spirit-art" viewBox="0 0 140 155"
-     xmlns="http://www.w3.org/2000/svg">
+    <header>
+        <div class="brand">Elsewhere</div>
 
-<defs>
-    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#e5f7ff" stop-opacity=".96"/>
-        <stop offset="45%" stop-color="#a8d9ed" stop-opacity=".78"/>
-        <stop offset="100%" stop-color="#6bafd0" stop-opacity=".88"/>
-    </linearGradient>
+        <div class="clock">
+            <div id="time">--:--</div>
+            <div id="date">Loading date...</div>
+        </div>
+    </header>
 
-    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#c6ed9b"/>
-        <stop offset="55%" stop-color="#79c878"/>
-        <stop offset="100%" stop-color="#3e9367"/>
-    </linearGradient>
-
-    <linearGradient id="flower" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#fffef2"/>
-        <stop offset="100%" stop-color="#e8e4d6"/>
-    </linearGradient>
-
-    <linearGradient id="starfish" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#ffd7a9"/>
-        <stop offset="55%" stop-color="#f2a77e"/>
-        <stop offset="100%" stop-color="#d77d69"/>
-    </linearGradient>
-
-    <filter id="glow">
-        <feGaussianBlur stdDeviation="6"/>
-    </filter>
-</defs>
-
-<!-- Soft glow -->
-<path d="
-M70 18 C40 18 20 39 20 68 L20 103
-C20 117 25 127 34 130 C43 133 49 126 53 119
-C58 132 64 136 70 136 C77 136 83 130 87 119
-C92 126 98 133 107 130 C116 127 120 117 120 103
-L120 68 C120 39 100 18 70 18 Z"
-fill="#9ed5ed" opacity=".2" filter="url(#glow)"/>
-
-<!-- Main body -->
-<path d="
-M70 18 C40 18 20 39 20 68 L20 103
-C20 117 25 127 34 130 C43 133 49 126 53 119
-C58 132 64 136 70 136 C77 136 83 130 87 119
-C92 126 98 133 107 130 C116 127 120 117 120 103
-L120 68 C120 39 100 18 70 18 Z"
-fill="url(#glass)"/>
-
-<!-- Frosted highlights -->
-<ellipse cx="48" cy="48" rx="17" ry="24"
-         fill="white" opacity=".12"/>
-
-<path d="M30 76 Q35 40 61 25"
-      fill="none" stroke="white"
-      stroke-width="2" opacity=".35"
-      stroke-linecap="round"/>
-
-<!-- Face -->
-<circle cx="53" cy="72" r="3" fill="#355c73"/>
-<circle cx="87" cy="72" r="3" fill="#355c73"/>
-<ellipse cx="70" cy="86" rx="2.5" ry="2"
-         fill="#355c73"/>
-
-<!-- Starfish: stays on the right eye -->
-<g transform="translate(87 65) rotate(12)">
-    <ellipse cx="1" cy="2" rx="15" ry="14"
-             fill="#9c625b" opacity=".18"/>
-    <path d="
-    M0 -13
-    C2 -13 3 -7 5 -5
-    C7 -5 13 -7 14 -4
-    C15 -1 9 2 8 4
-    C9 7 11 12 8 14
-    C5 15 2 9 0 8
-    C-3 10 -7 14 -10 12
-    C-12 10 -8 5 -8 2
-    C-11 0 -16 -2 -15 -5
-    C-14 -8 -8 -6 -5 -6
-    C-4 -9 -3 -13 0 -13 Z"
-    fill="url(#starfish)"
-    stroke="#d98770" stroke-width=".8"/>
-
-    <circle cx="-4" cy="-3" r="1.2" fill="#ffe7c8"/>
-    <circle cx="5" cy="1" r="1.1" fill="#ffe7c8"/>
-    <circle cx="1" cy="6" r=".9" fill="#ffe7c8"/>
-</g>
-
-<!-- Time-dependent accessory -->
-<g id="accessory"></g>
-
-</svg>
-</div>
-
-<main>
-
-<header>
-    <div class="logo">ELSEWHERE<span> .</span></div>
-    <div class="header-right" id="spirit-status">A LITTLE WORLD OF YOUR OWN</div>
-</header>
-
-<section class="hero">
-    <div>
-        <div class="subtitle">YOUR PERSONAL SPACE</div>
+    <section class="intro">
         <h1 id="greeting">Good evening.</h1>
-        <div class="subtitle">A little space to think.</div>
-    </div>
+        <p id="subtitle">A little space of your own.</p>
+    </section>
 
-    <div>
-        <div class="clock" id="clock">00:00</div>
-        <div class="subtitle date" id="date"></div>
-    </div>
-</section>
-
-<!-- SEARCH -->
-<section class="panel search-panel">
-    <div class="section-heading">
-        <div class="section-title">SEARCH</div>
-        <div class="section-number">01</div>
-    </div>
-
-    <form class="search-row" id="searchForm">
-        <input id="search" placeholder="What are you looking for?" autocomplete="off">
-        <button type="submit">SEARCH ↗</button>
-    </form>
-</section>
-
-<div class="grid">
-
-    <!-- WEBSITES -->
-    <section class="panel full">
-        <div class="section-heading">
-            <div class="section-title">QUICK ACCESS</div>
-            <div class="section-number">02 / BOOKMARKS</div>
-        </div>
-
-        <div class="sites" id="sites"></div>
-
-        <button class="add-site" id="toggleSiteForm">+ ADD A WEBSITE</button>
-
-        <form id="siteForm">
-            <input id="siteName" placeholder="Website name" required>
-            <input id="siteUrl" placeholder="Website URL" required>
-            <button type="submit">ADD</button>
+    <section class="search-wrap">
+        <form class="search" id="searchForm">
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Search the internet..."
+                autocomplete="off"
+            >
+            <button type="submit">Search ↗</button>
         </form>
     </section>
 
-    <!-- TASKS -->
-    <section class="panel">
-        <div class="section-heading">
-            <div class="section-title">TASKS</div>
-            <div class="section-number">03</div>
-        </div>
+    <main class="grid">
 
-        <form class="task-entry" id="taskForm">
-            <input id="taskInput" placeholder="Add something to do..." required>
-            <button type="submit">+</button>
-        </form>
+        <section class="panel">
+            <h2>Quick access</h2>
 
-        <div class="task-list" id="taskList"></div>
-    </section>
+            <div class="bookmarks" id="bookmarks"></div>
 
-    <!-- NOTES -->
-    <section class="panel">
-        <div class="section-heading">
-            <div class="section-title">NOTES & THOUGHTS</div>
-            <div class="section-number">04 / MEMORY</div>
-        </div>
+            <form class="add-site" id="addSiteForm">
+                <input id="siteName" placeholder="Name" required>
+                <input id="siteUrl" placeholder="Website URL" required>
+                <button class="add-button" type="submit">Add</button>
+            </form>
+        </section>
 
-        <textarea id="notes" placeholder="Write something down..."></textarea>
-        <div class="save-status" id="saveStatus">READY</div>
-    </section>
+        <section class="panel">
+            <h2>Tasks</h2>
 
+            <form id="taskForm">
+                <input
+                    class="task-input"
+                    id="taskInput"
+                    placeholder="Add something to do..."
+                    autocomplete="off"
+                    required
+                >
+            </form>
+
+            <div class="tasks" id="tasks"></div>
+        </section>
+
+        <section class="panel notes-panel">
+            <h2>Notes</h2>
+            <textarea
+                id="notes"
+                placeholder="Leave a thought here..."
+            ></textarea>
+            <div class="note-status" id="noteStatus">Saved locally</div>
+        </section>
+
+    </main>
+
+    <footer>YOUR OWN LITTLE CORNER OF THE INTERNET</footer>
 </div>
 
-<footer>
-    ELSEWHERE · YOUR OWN LITTLE CORNER OF THE INTERNET
-</footer>
+<div class="spirit-status" id="spiritStatus"></div>
 
-</main>
+<div id="spirit">
+    <svg viewBox="0 0 140 155" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity=".95"/>
+                <stop offset="45%" stop-color="#dceaff" stop-opacity=".65"/>
+                <stop offset="100%" stop-color="#a8c6d9" stop-opacity=".45"/>
+            </linearGradient>
+
+            <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#a8df9d"/>
+                <stop offset="100%" stop-color="#438b69"/>
+            </linearGradient>
+
+            <linearGradient id="flower" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fff2d5"/>
+                <stop offset="100%" stop-color="#e6b9db"/>
+            </linearGradient>
+
+            <filter id="glow">
+                <feGaussianBlur stdDeviation="4" result="blur"/>
+                <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+
+        <!-- Glass body -->
+        <path
+            d="M70 18
+               C40 18 22 43 23 83
+               C24 119 42 139 70 139
+               C98 139 116 119 117 83
+               C118 43 100 18 70 18Z"
+            fill="url(#glass)"
+            stroke="rgba(255,255,255,.9)"
+            stroke-width="2"
+            filter="url(#glow)"
+        />
+
+        <!-- Glass highlights -->
+        <path
+            d="M39 49 C43 34 53 28 63 27"
+            fill="none"
+            stroke="white"
+            stroke-width="4"
+            stroke-linecap="round"
+            opacity=".65"
+        />
+
+        <path
+            d="M31 80 C30 100 38 117 48 124"
+            fill="none"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+            opacity=".35"
+        />
+
+        <!-- Face -->
+        <ellipse cx="53" cy="72" rx="4.5" ry="6" fill="#34444b"/>
+        <ellipse cx="87" cy="72" rx="4.5" ry="6" fill="#34444b"/>
+        <path
+            d="M65 86 Q70 91 75 86"
+            fill="none"
+            stroke="#52666b"
+            stroke-width="2.5"
+            stroke-linecap="round"
+        />
+
+        <!-- Starfish on the right eye -->
+        <g transform="translate(87 65) rotate(12)">
+            <path
+                d="M0 -12
+                   L3 -4
+                   L11 -7
+                   L6 0
+                   L12 5
+                   L3 5
+                   L0 13
+                   L-3 5
+                   L-11 7
+                   L-6 0
+                   L-12 -5
+                   L-3 -5Z"
+                fill="#f2a879"
+                stroke="#fff0d9"
+                stroke-width="1.5"
+            />
+            <circle cx="0" cy="0" r="2" fill="#ffe8c6"/>
+        </g>
+
+        <!-- Accessory is inserted here -->
+        <g id="accessory"></g>
+    </svg>
+</div>
 
 <script>
+/* --------------------------------
+   CLOCK AND GREETING
+-------------------------------- */
 
-// STORAGE
-function load(key, fallback) {
-    try {
-        const value = localStorage.getItem(key);
-        return value === null ? fallback : JSON.parse(value);
-    } catch {
-        return fallback;
-    }
-}
-
-function save(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-}
-
-// CLOCK AND GREETING
-function updateTime() {
+function updateClock() {
     const now = new Date();
-    const hour = now.getHours();
 
-    document.getElementById("clock").textContent =
+    document.getElementById("time").textContent =
         now.toLocaleTimeString("en-AU", {
             hour: "2-digit",
-            minute: "2-digit",
-            hour12: false
+            minute: "2-digit"
         });
 
     document.getElementById("date").textContent =
@@ -604,75 +650,103 @@ function updateTime() {
             month: "long"
         });
 
+    const hour = now.getHours();
     let greeting = "Good evening.";
-    if (hour < 12) greeting = "Good morning.";
-    else if (hour < 17) greeting = "Good afternoon.";
+
+    if (hour >= 5 && hour < 12) {
+        greeting = "Good morning.";
+    } else if (hour >= 12 && hour < 17) {
+        greeting = "Good afternoon.";
+    } else if (hour >= 17 && hour < 22) {
+        greeting = "Good evening.";
+    } else {
+        greeting = "Still awake?";
+    }
 
     document.getElementById("greeting").textContent = greeting;
 }
 
-updateTime();
-setInterval(updateTime, 1000);
+updateClock();
+setInterval(updateClock, 1000);
 
 
-// SEARCH
-document.getElementById("searchForm").addEventListener("submit", e => {
-    e.preventDefault();
+/* --------------------------------
+   SEARCH
+-------------------------------- */
 
-    const query = document.getElementById("search").value.trim();
+document.getElementById("searchForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const query = document.getElementById("searchInput").value.trim();
 
     if (query) {
         window.open(
-            "https://www.google.com/search?q=" +
-            encodeURIComponent(query),
-            "_blank",
-            "noopener"
+            "https://www.google.com/search?q=" + encodeURIComponent(query),
+            "_blank"
         );
     }
 });
 
 
-// QUICK ACCESS
+/* --------------------------------
+   BOOKMARKS
+-------------------------------- */
+
 const defaultSites = [
-    {name: "Knoxi", url: "https://knoxi.au", icon: "✳"},
-    {name: "Wordle", url: "https://www.nytimes.com/games/wordle/index.html", icon: "▦"},
-    {name: "Google Docs", url: "https://docs.google.com/document/u/0/", icon: "▤"},
-    {name: "ChatGPT", url: "https://chatgpt.com", icon: "✧"}
+    {
+        name: "Wordle",
+        url: "https://www.nytimes.com/games/wordle/index.html",
+        icon: "▦"
+    },
+    {
+        name: "Google Docs",
+        url: "https://docs.google.com",
+        icon: "▤"
+    },
+    {
+        name: "ChatGPT",
+        url: "https://chatgpt.com",
+        icon: "✳"
+    }
 ];
 
-let sites = load("elsewhereSites", defaultSites);
+let sites = JSON.parse(localStorage.getItem("elsewhereSites")) || defaultSites;
+
+function saveSites() {
+    localStorage.setItem("elsewhereSites", JSON.stringify(sites));
+}
 
 function renderSites() {
-    const container = document.getElementById("sites");
-    container.replaceChildren();
+    const container = document.getElementById("bookmarks");
+    container.innerHTML = "";
 
     sites.forEach((site, index) => {
         const link = document.createElement("a");
-        link.className = "site";
+        link.className = "bookmark";
         link.href = site.url;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
 
-        const icon = document.createElement("div");
-        icon.className = "site-icon";
+        const icon = document.createElement("span");
+        icon.className = "bookmark-icon";
         icon.textContent = site.icon || "↗";
 
-        const name = document.createElement("div");
-        name.className = "site-name";
+        const name = document.createElement("span");
+        name.className = "bookmark-name";
         name.textContent = site.name;
 
         const remove = document.createElement("button");
-        remove.className = "site-remove";
-        remove.textContent = "×";
+        remove.className = "delete-site";
         remove.type = "button";
-        remove.title = "Remove website";
+        remove.textContent = "×";
+        remove.title = "Remove bookmark";
 
-        remove.addEventListener("click", e => {
-            e.preventDefault();
-            e.stopPropagation();
+        remove.addEventListener("click", function(event) {
+            event.preventDefault();
+            event.stopPropagation();
 
             sites.splice(index, 1);
-            save("elsewhereSites", sites);
+            saveSites();
             renderSites();
         });
 
@@ -681,319 +755,267 @@ function renderSites() {
     });
 }
 
-document.getElementById("toggleSiteForm").onclick = () => {
-    const form = document.getElementById("siteForm");
-    form.classList.toggle("visible");
-
-    if (form.classList.contains("visible")) {
-        document.getElementById("siteName").focus();
-    }
-};
-
-document.getElementById("siteForm").addEventListener("submit", e => {
-    e.preventDefault();
+document.getElementById("addSiteForm").addEventListener("submit", function(event) {
+    event.preventDefault();
 
     const name = document.getElementById("siteName").value.trim();
     let url = document.getElementById("siteUrl").value.trim();
+
+    if (!name || !url) return;
 
     if (!/^https?:\/\//i.test(url)) {
         url = "https://" + url;
     }
 
-    try {
-        const parsed = new URL(url);
+    sites.push({
+        name: name,
+        url: url,
+        icon: "↗"
+    });
 
-        if (!["http:", "https:"].includes(parsed.protocol)) {
-            throw new Error("Invalid protocol");
-        }
+    saveSites();
+    renderSites();
 
-        sites.push({
-            name,
-            url: parsed.href,
-            icon: "↗"
-        });
-
-        save("elsewhereSites", sites);
-        renderSites();
-
-        document.getElementById("siteForm").reset();
-        document.getElementById("siteForm").classList.remove("visible");
-
-    } catch {
-        alert("Please enter a valid website address.");
-    }
+    this.reset();
 });
 
 renderSites();
 
 
-// TASKS
-let tasks = load("elsewhereTasks", []);
+/* --------------------------------
+   TASKS
+-------------------------------- */
+
+let tasks = JSON.parse(localStorage.getItem("elsewhereTasks")) || [];
+
+function saveTasks() {
+    localStorage.setItem("elsewhereTasks", JSON.stringify(tasks));
+}
 
 function renderTasks() {
-    const list = document.getElementById("taskList");
-    list.replaceChildren();
-
-    if (tasks.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = "Nothing on the list. Enjoy the peace.";
-        list.appendChild(empty);
-        return;
-    }
+    const container = document.getElementById("tasks");
+    container.innerHTML = "";
 
     tasks.forEach((task, index) => {
         const row = document.createElement("div");
         row.className = "task" + (task.done ? " done" : "");
 
-        const check = document.createElement("input");
-        check.type = "checkbox";
-        check.checked = task.done;
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.done;
 
-        check.addEventListener("change", () => {
-            tasks[index].done = check.checked;
-            save("elsewhereTasks", tasks);
+        checkbox.addEventListener("change", function() {
+            tasks[index].done = checkbox.checked;
+            saveTasks();
             renderTasks();
         });
 
-        const label = document.createElement("span");
-        label.textContent = task.text;
+        const text = document.createElement("span");
+        text.textContent = task.text;
 
         const remove = document.createElement("button");
+        remove.className = "task-delete";
+        remove.type = "button";
         remove.textContent = "×";
         remove.title = "Delete task";
 
-        remove.addEventListener("click", () => {
+        remove.addEventListener("click", function() {
             tasks.splice(index, 1);
-            save("elsewhereTasks", tasks);
+            saveTasks();
             renderTasks();
         });
 
-        row.append(check, label, remove);
-        list.appendChild(row);
+        row.append(checkbox, text, remove);
+        container.appendChild(row);
     });
 }
 
-document.getElementById("taskForm").addEventListener("submit", e => {
-    e.preventDefault();
+document.getElementById("taskForm").addEventListener("submit", function(event) {
+    event.preventDefault();
 
     const input = document.getElementById("taskInput");
     const text = input.value.trim();
 
     if (!text) return;
 
-    tasks.push({text, done: false});
-    save("elsewhereTasks", tasks);
+    tasks.push({
+        text: text,
+        done: false
+    });
 
-    input.value = "";
+    saveTasks();
     renderTasks();
+    input.value = "";
 });
 
 renderTasks();
 
 
-// NOTES
+/* --------------------------------
+   NOTES
+-------------------------------- */
+
 const notes = document.getElementById("notes");
+const noteStatus = document.getElementById("noteStatus");
 
 notes.value = localStorage.getItem("elsewhereNotes") || "";
 
-notes.addEventListener("input", () => {
+notes.addEventListener("input", function() {
     localStorage.setItem("elsewhereNotes", notes.value);
-    document.getElementById("saveStatus").textContent =
-        "SAVED AUTOMATICALLY";
+    noteStatus.textContent = "Saved";
 });
 
 
-// MASCOT ACCESSORY LIFE CYCLE
+/* --------------------------------
+   LITTLE SPIRIT
+-------------------------------- */
+
 const accessory = document.getElementById("accessory");
-
-function updateAccessory() {
-    const now = new Date();
-    const hour = now.getHours();
-
-    let design;
-
-    if (hour >= 0 && hour < 6) {
-        design = bulb();
-    } else if (hour >= 6 && hour < 13) {
-        design = sprout();
-    } else {
-        design = queenOfTheNight();
-    }
-
-    // Only redraw when the accessory actually changes.
-    if (accessory.dataset.design !== design.name) {
-        accessory.innerHTML = design.svg;
-        accessory.dataset.design = design.name;
-    }
-
-    const status = document.getElementById("spirit-status");
-
-    if (design.name === "bulb") {
-        status.textContent = "RESTING IN ITS BULB";
-    } else if (design.name === "sprout") {
-        status.textContent = "A LITTLE SPROUT";
-    } else {
-        status.textContent = "QUEEN OF THE NIGHT";
-    }
-}
+const spiritStatus = document.getElementById("spiritStatus");
 
 function bulb() {
-    return {
-        name: "bulb",
-        svg: `
-        <g class="accessory">
-            <path d="M70 20 Q70 13 70 8"
-                  stroke="#668b54" stroke-width="2.5"
-                  fill="none" stroke-linecap="round"/>
-
-            <path d="
-            M70 9
-            C58 8 57 -2 70 -5
-            C83 -2 82 8 70 9 Z"
-            fill="url(#green)" stroke="#5b965e"
-            stroke-width=".7"/>
-
-            <path d="M70 8 L70 13"
-                  stroke="#668b54" stroke-width="2"
-                  stroke-linecap="round"/>
-        </g>`
-    };
+    return `
+        <g transform="translate(70 22)">
+            <path
+                d="M0 0 C-12 -10 -22 1 -18 13
+                   C-16 19 -10 21 -9 28
+                   L9 28
+                   C10 21 16 19 18 13
+                   C22 1 12 -10 0 0Z"
+                fill="#ffe8a6"
+                stroke="#fff4d1"
+                stroke-width="2"
+                filter="url(#glow)"
+            />
+            <path
+                d="M-8 29 L8 29 M-7 34 L7 34 M-5 39 L5 39"
+                stroke="#d5b77e"
+                stroke-width="3"
+                stroke-linecap="round"
+            />
+            <path
+                d="M0 -9 L0 -16 M-23 1 L-29 -3 M23 1 L29 -3"
+                stroke="#ffe8a6"
+                stroke-width="2"
+                stroke-linecap="round"
+            />
+        </g>
+    `;
 }
 
 function sprout() {
-    return {
-        name: "sprout",
-        svg: `
-        <g class="accessory">
-            <path d="M70 22 Q70 12 70 3"
-                  stroke="#548d58" stroke-width="3"
-                  fill="none" stroke-linecap="round"/>
-
-            <path d="
-            M70 12
-            C57 12 52 4 55 0
-            C64 -1 70 4 70 12 Z"
-            fill="url(#green)"/>
-
-            <path d="
-            M70 8
-            C72 -1 82 -5 88 -1
-            C87 7 79 12 70 8 Z"
-            fill="url(#green)"/>
-        </g>`
-    };
+    return `
+        <g transform="translate(70 18)">
+            <path
+                d="M0 30 Q0 7 0 -5"
+                stroke="#6a9d67"
+                stroke-width="4"
+                stroke-linecap="round"
+                fill="none"
+            />
+            <path
+                d="M0 11 C-25 8 -29 -13 -8 -17
+                   C2 -12 4 0 0 11Z"
+                fill="url(#green)"
+                stroke="#c5e8a9"
+                stroke-width="1.5"
+            />
+            <path
+                d="M0 3 C14 -20 33 -11 27 4
+                   C20 17 7 17 0 11Z"
+                fill="#8fbd81"
+                stroke="#d0edb5"
+                stroke-width="1.5"
+            />
+            <path
+                d="M-15 -9 Q-7 -5 0 11 M22 -5 Q12 1 0 11"
+                fill="none"
+                stroke="#d9efc5"
+                stroke-width="1.5"
+            />
+        </g>
+    `;
 }
 
 function queenOfTheNight() {
-    return {
-        name: "flower",
-        svg: `
-        <g class="accessory">
-            <!-- Stem -->
-            <path d="M70 22 Q70 14 70 9"
-                  stroke="#548d58" stroke-width="2.5"
-                  fill="none" stroke-linecap="round"/>
-
-            <!-- Sepals -->
-            <path d="M70 13 Q61 8 59 4 Q68 5 70 13"
-                  fill="#8eae79"/>
-            <path d="M70 13 Q79 8 81 4 Q72 5 70 13"
-                  fill="#8eae79"/>
-
-            <!-- Outer petals -->
-            <path d="M70 8
-                     C60 3 55 -4 60 -10
-                     C66 -12 69 -4 70 8"
-                  fill="url(#flower)" stroke="#dedacb" stroke-width=".5"/>
-
-            <path d="M70 8
-                     C80 3 85 -4 80 -10
-                     C74 -12 71 -4 70 8"
-                  fill="url(#flower)" stroke="#dedacb" stroke-width=".5"/>
-
-            <path d="M70 8
-                     C59 8 49 2 53 -5
-                     C61 -8 68 0 70 8"
-                  fill="url(#flower)" stroke="#dedacb" stroke-width=".5"/>
-
-            <path d="M70 8
-                     C81 8 91 2 87 -5
-                     C79 -8 72 0 70 8"
-                  fill="url(#flower)" stroke="#dedacb" stroke-width=".5"/>
-
-            <!-- Inner petals -->
-            <path d="M70 8
-                     C64 2 63 -7 70 -12
-                     C77 -7 76 2 70 8"
-                  fill="#fffef5" stroke="#e4dfd1" stroke-width=".5"/>
-
-            <!-- Centre -->
-            <circle cx="70" cy="6" r="2.2" fill="#e9d9a0"/>
-
-            <!-- Stamens -->
-            <g stroke="#d6b76c" stroke-width=".8"
-               stroke-linecap="round">
-                <path d="M70 6 L70 -5"/>
-                <path d="M70 6 L64 -3"/>
-                <path d="M70 6 L76 -3"/>
-                <path d="M70 6 L61 1"/>
-                <path d="M70 6 L79 1"/>
-            </g>
-
-            <g fill="#d6b76c">
-                <circle cx="70" cy="-5" r="1.1"/>
-                <circle cx="64" cy="-3" r="1.1"/>
-                <circle cx="76" cy="-3" r="1.1"/>
-                <circle cx="61" cy="1" r="1.1"/>
-                <circle cx="79" cy="1" r="1.1"/>
-            </g>
-        </g>`
-    };
+    return `
+        <g transform="translate(70 22)" filter="url(#glow)">
+            <path
+                d="M0 14
+                   C-25 12 -29 -9 -12 -14
+                   C-8 -27 7 -25 12 -14
+                   C30 -11 25 12 0 14Z"
+                fill="url(#flower)"
+                stroke="#fff1ed"
+                stroke-width="1.5"
+            />
+            <path
+                d="M0 14
+                   C-10 0 -22 -2 -19 -15
+                   C-7 -18 0 -7 0 14Z"
+                fill="#f8d9e9"
+                stroke="#fff1ed"
+                stroke-width="1"
+            />
+            <path
+                d="M0 14
+                   C10 0 22 -2 19 -15
+                   C7 -18 0 -7 0 14Z"
+                fill="#f1c9e4"
+                stroke="#fff1ed"
+                stroke-width="1"
+            />
+            <circle cx="0" cy="5" r="5" fill="#f7d58c"/>
+            <path
+                d="M0 19 Q0 31 0 38"
+                stroke="#78a777"
+                stroke-width="3"
+                fill="none"
+                stroke-linecap="round"
+            />
+            <path
+                d="M0 29 Q-15 18 -19 29 Q-9 36 0 29Z"
+                fill="#77a978"
+            />
+        </g>
+    `;
 }
 
-// Check immediately, then every minute.
+let currentAccessory = "";
+
+function updateAccessory() {
+    const hour = new Date().getHours();
+    let nextAccessory;
+    let status;
+
+    if (hour >= 0 && hour < 6) {
+        nextAccessory = "bulb";
+        status = "Resting";
+    } else if (hour >= 6 && hour < 13) {
+        nextAccessory = "sprout";
+        status = "Growing";
+    } else {
+        nextAccessory = "flower";
+        status = "In bloom";
+    }
+
+    if (nextAccessory === currentAccessory) return;
+
+    currentAccessory = nextAccessory;
+
+    if (nextAccessory === "bulb") {
+        accessory.innerHTML = bulb();
+    } else if (nextAccessory === "sprout") {
+        accessory.innerHTML = sprout();
+    } else {
+        accessory.innerHTML = queenOfTheNight();
+    }
+
+    spiritStatus.textContent = status;
+}
+
 updateAccessory();
 setInterval(updateAccessory, 60000);
-
-
-// RANDOM FLOATING MOVEMENT
-const spirit = document.getElementById("spirit");
-
-function moveSpirit() {
-    const margin = 35;
-    const spiritWidth = spirit.offsetWidth;
-    const spiritHeight = spirit.offsetHeight;
-
-    const maxX = Math.max(margin, window.innerWidth - spiritWidth - margin);
-    const maxY = Math.max(margin, window.innerHeight - spiritHeight - margin);
-
-    const x = margin + Math.random() * (maxX - margin);
-    const y = margin + Math.random() * (maxY - margin);
-
-    spirit.style.left = x + "px";
-    spirit.style.top = y + "px";
-
-    spirit.style.transitionDuration =
-        (4 + Math.random() * 5) + "s";
-}
-
-moveSpirit();
-
-function scheduleSpirit() {
-    const delay = 4500 + Math.random() * 5500;
-
-    setTimeout(() => {
-        moveSpirit();
-        scheduleSpirit();
-    }, delay);
-}
-
-scheduleSpirit();
-
-window.addEventListener("resize", moveSpirit);
-
 </script>
-
 </body>
 </html>
