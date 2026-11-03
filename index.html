@@ -1,0 +1,827 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elsewhere — Personal Dashboard</title>
+
+<style>
+:root {
+    --bg: #101a19;
+    --panel: rgba(35, 53, 47, .66);
+    --panel-hover: rgba(48, 70, 60, .8);
+    --border: rgba(190, 220, 197, .14);
+    --text: #e5eee5;
+    --muted: #9aafa1;
+    --accent: #b2d1b5;
+    --accent2: #d3b9d9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 35px;
+    background:
+        radial-gradient(ellipse at 15% 10%, #243c32 0%, transparent 45%),
+        radial-gradient(ellipse at 90% 85%, #25313b 0%, transparent 45%),
+        var(--bg);
+    color: var(--text);
+    font-family: "SF Pro Display", "Segoe UI", sans-serif;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(200,230,205,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,230,205,.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+}
+
+main {
+    max-width: 1100px;
+    margin: auto;
+    position: relative;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 19px;
+    margin-bottom: 36px;
+}
+
+.logo {
+    font-size: 17px;
+    letter-spacing: 5px;
+    font-weight: 650;
+}
+
+.logo span { color: var(--accent); }
+
+.header-right {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+}
+
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 30px;
+}
+
+h1 {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 400;
+    letter-spacing: -2px;
+    margin: 8px 0;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.clock {
+    color: var(--accent);
+    font-size: 32px;
+    font-weight: 300;
+    font-variant-numeric: tabular-nums;
+}
+
+.date {
+    text-align: right;
+    margin-top: 5px;
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 22px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 12px 35px rgba(0,0,0,.12);
+    min-width: 0;
+    transition: background .2s, border-color .2s;
+}
+
+.panel:hover {
+    background: var(--panel-hover);
+    border-color: rgba(190,220,197,.25);
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 19px;
+}
+
+.section-title {
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 2px;
+    color: var(--accent);
+}
+
+.section-number {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.search-panel {
+    margin-bottom: 19px;
+}
+
+.search-row {
+    display: flex;
+    gap: 10px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    color: var(--text);
+    background: rgba(10,20,17,.55);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+input:focus, textarea:focus {
+    border-color: var(--accent);
+}
+
+button {
+    color: var(--accent);
+    background: rgba(178,209,181,.09);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+button:hover {
+    background: rgba(178,209,181,.2);
+    border-color: var(--accent);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1.15fr .85fr;
+    gap: 19px;
+}
+
+.full { grid-column: 1 / -1; }
+
+.sites {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 11px;
+}
+
+.site {
+    min-width: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 105px;
+    padding: 14px 7px;
+    color: var(--text);
+    text-decoration: none;
+    background: rgba(255,255,255,.025);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    transition: .2s;
+}
+
+.site:hover {
+    background: rgba(178,209,181,.12);
+    transform: translateY(-3px);
+}
+
+.site-icon {
+    font-size: 25px;
+}
+
+.site-name {
+    font-size: 12px;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.site-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    padding: 2px 6px;
+    opacity: 0;
+    font-size: 11px;
+    border: none;
+    background: rgba(0,0,0,.3);
+}
+
+.site:hover .site-remove { opacity: 1; }
+
+.add-site {
+    margin-top: 14px;
+    width: 100%;
+}
+
+#siteForm {
+    display: none;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 8px;
+    margin-top: 13px;
+}
+
+#siteForm.visible { display: grid; }
+
+textarea {
+    min-height: 180px;
+    resize: vertical;
+    line-height: 1.8;
+}
+
+.save-status {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.task-entry {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.task input {
+    width: 15px;
+    height: 15px;
+    accent-color: #b2d1b5;
+}
+
+.task span { flex: 1; }
+
+.task.done span {
+    color: var(--muted);
+    text-decoration: line-through;
+}
+
+.task button {
+    padding: 3px 8px;
+    border: none;
+    opacity: .6;
+}
+
+.empty {
+    color: var(--muted);
+    font-size: 12px;
+    padding: 8px 0;
+}
+
+footer {
+    text-align: center;
+    color: #81958a;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 32px 0 10px;
+}
+
+/* FLOATING SPIRIT */
+
+#spirit {
+    position: fixed;
+    left: 70%;
+    top: 25%;
+    width: 65px;
+    height: 72px;
+    z-index: 10;
+    pointer-events: none;
+    transition: left 5s cubic-bezier(.35,.05,.45,1),
+                top 5s cubic-bezier(.35,.05,.45,1);
+    animation: spiritBob 3s ease-in-out infinite;
+    filter: drop-shadow(0 5px 12px rgba(155,220,190,.2));
+}
+
+#spirit svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+@keyframes spiritBob {
+    0%, 100% { margin-top: 0; }
+    50% { margin-top: -9px; }
+}
+
+.stage-decoration { display: none; }
+.stage-bulb .bulb,
+.stage-sprout .sprout,
+.stage-queen .queen { display: block; }
+
+#spirit-status {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+@media(max-width: 700px) {
+    body { padding: 18px; }
+    .grid { grid-template-columns: 1fr; }
+    .full { grid-column: 1; }
+    .sites { grid-template-columns: repeat(2,1fr); }
+    .hero { align-items: start; }
+    .clock { font-size: 24px; }
+    #siteForm { grid-template-columns: 1fr; }
+    #spirit { width: 52px; height: 58px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- THE LITTLE SPIRIT -->
+<div id="spirit" class="stage-sprout">
+<svg viewBox="0 0 80 85" xmlns="http://www.w3.org/2000/svg">
+
+<defs>
+    <linearGradient id="ghost" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#e5f6f0" stop-opacity=".95"/>
+        <stop offset="100%" stop-color="#9bc7cf" stop-opacity=".72"/>
+    </linearGradient>
+</defs>
+
+<!-- Queen of the Night flower -->
+<g class="stage-decoration queen">
+    <g fill="#e6c6df" stroke="#f0d8e9" stroke-width=".7">
+        <ellipse cx="39" cy="13" rx="6" ry="12" transform="rotate(0 39 13)"/>
+        <ellipse cx="39" cy="13" rx="6" ry="12" transform="rotate(45 39 13)"/>
+        <ellipse cx="39" cy="13" rx="6" ry="12" transform="rotate(90 39 13)"/>
+        <ellipse cx="39" cy="13" rx="6" ry="12" transform="rotate(135 39 13)"/>
+    </g>
+    <circle cx="39" cy="13" r="4" fill="#e9d7a4"/>
+</g>
+
+<!-- Sprout -->
+<g class="stage-decoration sprout">
+    <path d="M39 24 Q38 12 39 7" stroke="#79ad78" stroke-width="2.5" fill="none"/>
+    <path d="M39 15 Q24 1 22 11 Q25 20 39 15" fill="#9ecb91"/>
+    <path d="M39 11 Q48 -1 56 7 Q54 17 39 11" fill="#79ad85"/>
+</g>
+
+<!-- Bulb -->
+<g class="stage-decoration bulb">
+    <path d="M39 24 Q26 16 30 8 Q39 0 48 8 Q53 17 39 24" fill="#d8c7b2" stroke="#eee1d0" stroke-width="1"/>
+    <path d="M39 22 L39 28" stroke="#87aa83" stroke-width="2"/>
+    <path d="M39 17 Q34 10 39 5 Q44 10 39 17" fill="#f0dfbb"/>
+</g>
+
+<!-- Spirit body -->
+<path d="M13 38
+C13 21 24 27 29 27
+C34 25 46 25 51 28
+C67 30 68 48 67 58
+L66 72
+Q61 66 55 73
+Q49 79 42 73
+Q34 80 26 73
+Q18 78 12 72
+Z"
+fill="url(#ghost)" stroke="#d8eee8" stroke-opacity=".65" stroke-width="1.3"/>
+
+<!-- Face -->
+<circle cx="30" cy="49" r="2.6" fill="#344d4c"/>
+<circle cx="49" cy="49" r="2.6" fill="#344d4c"/>
+<path d="M37 56 Q40 59 43 56" stroke="#536e6a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+<!-- Starfish, slightly higher on right eye -->
+<g transform="translate(51 39)">
+    <path d="M0 -8 L2.5 -3 L8 -3 L4 1 L5 7 L0 4 L-5 7 L-4 1 L-8 -3 L-2.5 -3 Z"
+    fill="#edb18f" stroke="#f5d1ad" stroke-width="1"/>
+    <circle cx="0" cy="0" r="1.2" fill="#f8d5b2"/>
+</g>
+
+</svg>
+</div>
+
+<main>
+
+<header>
+    <div class="logo">ELSEWHERE<span> .</span></div>
+    <div class="header-right" id="spirit-status">A LITTLE WORLD OF YOUR OWN</div>
+</header>
+
+<section class="hero">
+    <div>
+        <div class="subtitle">YOUR PERSONAL SPACE</div>
+        <h1 id="greeting">Good evening.</h1>
+        <div class="subtitle">A little space to think.</div>
+    </div>
+
+    <div>
+        <div class="clock" id="clock">00:00</div>
+        <div class="subtitle date" id="date"></div>
+    </div>
+</section>
+
+<!-- SEARCH -->
+<section class="panel search-panel">
+    <div class="section-heading">
+        <div class="section-title">SEARCH</div>
+        <div class="section-number">01</div>
+    </div>
+
+    <form class="search-row" id="searchForm">
+        <input id="search" placeholder="What are you looking for?" autocomplete="off">
+        <button type="submit">SEARCH ↗</button>
+    </form>
+</section>
+
+<div class="grid">
+
+    <!-- WEBSITES -->
+    <section class="panel full">
+        <div class="section-heading">
+            <div class="section-title">QUICK ACCESS</div>
+            <div class="section-number">02 / BOOKMARKS</div>
+        </div>
+
+        <div class="sites" id="sites"></div>
+
+        <button class="add-site" id="toggleSiteForm">+ ADD A WEBSITE</button>
+
+        <form id="siteForm">
+            <input id="siteName" placeholder="Website name" required>
+            <input id="siteUrl" placeholder="Website URL" required>
+            <button type="submit">ADD</button>
+        </form>
+    </section>
+
+    <!-- TASKS -->
+    <section class="panel">
+        <div class="section-heading">
+            <div class="section-title">TASKS</div>
+            <div class="section-number">03</div>
+        </div>
+
+        <form class="task-entry" id="taskForm">
+            <input id="taskInput" placeholder="Add something to do..." required>
+            <button type="submit">+</button>
+        </form>
+
+        <div class="task-list" id="taskList"></div>
+    </section>
+
+    <!-- NOTES -->
+    <section class="panel">
+        <div class="section-heading">
+            <div class="section-title">NOTES & THOUGHTS</div>
+            <div class="section-number">04 / MEMORY</div>
+        </div>
+
+        <textarea id="notes" placeholder="Write something down..."></textarea>
+        <div class="save-status" id="saveStatus">READY</div>
+    </section>
+
+</div>
+
+<footer>
+    ELSEWHERE · YOUR OWN LITTLE CORNER OF THE INTERNET
+</footer>
+
+</main>
+
+<script>
+
+// STORAGE
+function load(key, fallback) {
+    try {
+        const value = localStorage.getItem(key);
+        return value === null ? fallback : JSON.parse(value);
+    } catch {
+        return fallback;
+    }
+}
+
+function save(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+// CLOCK AND GREETING
+function updateTime() {
+    const now = new Date();
+    const hour = now.getHours();
+
+    document.getElementById("clock").textContent =
+        now.toLocaleTimeString("en-AU", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        });
+
+    document.getElementById("date").textContent =
+        now.toLocaleDateString("en-AU", {
+            weekday: "long",
+            day: "numeric",
+            month: "long"
+        });
+
+    let greeting = "Good evening.";
+    if (hour < 12) greeting = "Good morning.";
+    else if (hour < 17) greeting = "Good afternoon.";
+
+    document.getElementById("greeting").textContent = greeting;
+}
+
+updateTime();
+setInterval(updateTime, 1000);
+
+
+// SEARCH
+document.getElementById("searchForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    const query = document.getElementById("search").value.trim();
+
+    if (query) {
+        window.open(
+            "https://www.google.com/search?q=" +
+            encodeURIComponent(query),
+            "_blank",
+            "noopener"
+        );
+    }
+});
+
+
+// QUICK ACCESS
+const defaultSites = [
+    {name: "Knoxi", url: "https://knoxi.au", icon: "✳"},
+    {name: "Wordle", url: "https://www.nytimes.com/games/wordle/index.html", icon: "▦"},
+    {name: "Google Docs", url: "https://docs.google.com/document/u/0/", icon: "▤"},
+    {name: "ChatGPT", url: "https://chatgpt.com", icon: "✧"}
+];
+
+let sites = load("elsewhereSites", defaultSites);
+
+function renderSites() {
+    const container = document.getElementById("sites");
+    container.replaceChildren();
+
+    sites.forEach((site, index) => {
+        const link = document.createElement("a");
+        link.className = "site";
+        link.href = site.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+
+        const icon = document.createElement("div");
+        icon.className = "site-icon";
+        icon.textContent = site.icon || "↗";
+
+        const name = document.createElement("div");
+        name.className = "site-name";
+        name.textContent = site.name;
+
+        const remove = document.createElement("button");
+        remove.className = "site-remove";
+        remove.textContent = "×";
+        remove.type = "button";
+        remove.title = "Remove website";
+
+        remove.addEventListener("click", e => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            sites.splice(index, 1);
+            save("elsewhereSites", sites);
+            renderSites();
+        });
+
+        link.append(icon, name, remove);
+        container.appendChild(link);
+    });
+}
+
+document.getElementById("toggleSiteForm").onclick = () => {
+    const form = document.getElementById("siteForm");
+    form.classList.toggle("visible");
+
+    if (form.classList.contains("visible")) {
+        document.getElementById("siteName").focus();
+    }
+};
+
+document.getElementById("siteForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    const name = document.getElementById("siteName").value.trim();
+    let url = document.getElementById("siteUrl").value.trim();
+
+    if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+    }
+
+    try {
+        const parsed = new URL(url);
+
+        if (!["http:", "https:"].includes(parsed.protocol)) {
+            throw new Error("Invalid protocol");
+        }
+
+        sites.push({
+            name,
+            url: parsed.href,
+            icon: "↗"
+        });
+
+        save("elsewhereSites", sites);
+        renderSites();
+
+        document.getElementById("siteForm").reset();
+        document.getElementById("siteForm").classList.remove("visible");
+
+    } catch {
+        alert("Please enter a valid website address.");
+    }
+});
+
+renderSites();
+
+
+// TASKS
+let tasks = load("elsewhereTasks", []);
+
+function renderTasks() {
+    const list = document.getElementById("taskList");
+    list.replaceChildren();
+
+    if (tasks.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "Nothing on the list. Enjoy the peace.";
+        list.appendChild(empty);
+        return;
+    }
+
+    tasks.forEach((task, index) => {
+        const row = document.createElement("div");
+        row.className = "task" + (task.done ? " done" : "");
+
+        const check = document.createElement("input");
+        check.type = "checkbox";
+        check.checked = task.done;
+
+        check.addEventListener("change", () => {
+            tasks[index].done = check.checked;
+            save("elsewhereTasks", tasks);
+            renderTasks();
+        });
+
+        const label = document.createElement("span");
+        label.textContent = task.text;
+
+        const remove = document.createElement("button");
+        remove.textContent = "×";
+        remove.title = "Delete task";
+
+        remove.addEventListener("click", () => {
+            tasks.splice(index, 1);
+            save("elsewhereTasks", tasks);
+            renderTasks();
+        });
+
+        row.append(check, label, remove);
+        list.appendChild(row);
+    });
+}
+
+document.getElementById("taskForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    const input = document.getElementById("taskInput");
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    tasks.push({text, done: false});
+    save("elsewhereTasks", tasks);
+
+    input.value = "";
+    renderTasks();
+});
+
+renderTasks();
+
+
+// NOTES
+const notes = document.getElementById("notes");
+
+notes.value = localStorage.getItem("elsewhereNotes") || "";
+
+notes.addEventListener("input", () => {
+    localStorage.setItem("elsewhereNotes", notes.value);
+    document.getElementById("saveStatus").textContent =
+        "SAVED AUTOMATICALLY";
+});
+
+
+// MASCOT LIFE CYCLE
+function updateSpiritStage() {
+    const hour = new Date().getHours();
+    const spirit = document.getElementById("spirit");
+    const status = document.getElementById("spirit-status");
+
+    spirit.classList.remove(
+        "stage-bulb",
+        "stage-sprout",
+        "stage-queen"
+    );
+
+    if (hour < 6) {
+        spirit.classList.add("stage-bulb");
+        status.textContent = "RESTING IN ITS BULB";
+    } else if (hour < 13) {
+        spirit.classList.add("stage-sprout");
+        status.textContent = "A LITTLE SPROUT";
+    } else {
+        spirit.classList.add("stage-queen");
+        status.textContent = "QUEEN OF THE NIGHT";
+    }
+}
+
+updateSpiritStage();
+setInterval(updateSpiritStage, 60000);
+
+
+// RANDOM FLOATING MOVEMENT
+const spirit = document.getElementById("spirit");
+
+function moveSpirit() {
+    const margin = 35;
+
+    const maxX = Math.max(margin, window.innerWidth - 80);
+    const maxY = Math.max(margin, window.innerHeight - 90);
+
+    const x = margin + Math.random() * (maxX - margin);
+    const y = margin + Math.random() * (maxY - margin);
+
+    spirit.style.left = x + "px";
+    spirit.style.top = y + "px";
+
+    // Occasionally change direction more slowly.
+    spirit.style.transitionDuration =
+        (4 + Math.random() * 5) + "s";
+}
+
+moveSpirit();
+
+function scheduleSpirit() {
+    const delay = 4500 + Math.random() * 5500;
+
+    setTimeout(() => {
+        moveSpirit();
+        scheduleSpirit();
+    }, delay);
+}
+
+scheduleSpirit();
+
+window.addEventListener("resize", moveSpirit);
+
+</script>
+
+</body>
+</html>
