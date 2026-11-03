@@ -606,10 +606,10 @@ footer {
     <div class="game-topbar"><div class="game-brand">ELSEWHERE · SPIRIT ESCAPE</div><button id="gameClose" type="button" aria-label="Close game">×</button></div>
     <div class="game-progress-wrap"><div id="gameProgress"></div></div>
     <div id="gameLevel">Garden 1</div>
-    <div class="game-card" id="gameIntro"><h2>Spirit Escape</h2><p>Guide the little spirit through the garden. Avoid the drifting shapes and reach the far edge.</p><button type="button" class="game-action" id="gameStart">ENTER GARDEN</button></div>
+    <div class="game-card" id="gameIntro"><h2>Spirit Escape</h2><p>Guide the little spirit freely in every direction. Avoid the drifting shapes and find the glowing exit in the far corner. Use your pointer or finger, or WASD / arrow keys.</p><button type="button" class="game-action" id="gameStart">ENTER GARDEN</button></div>
     <div class="game-card" id="gameRetry" hidden><h2>A little mishap</h2><p>The garden got the better of you. The same garden is waiting.</p><button type="button" class="game-action" id="gameRetryButton">TRY AGAIN</button></div>
     <div class="game-card" id="gameNext" hidden><h2>Garden escaped</h2><p>A new garden is growing. This one will be a little busier.</p><button type="button" class="game-action" id="gameNextButton">NEXT GARDEN</button></div>
-    <div class="game-hint">MOVE YOUR POINTER OR FINGER TO GUIDE THE SPIRIT</div>
+    <div class="game-hint">MOVE FREELY · POINTER / TOUCH OR WASD / ARROW KEYS</div>
   </div>
 </div>
 
@@ -918,10 +918,13 @@ const gameRetry = document.getElementById("gameRetry");
 const gameNext = document.getElementById("gameNext");
 const gameProgress = document.getElementById("gameProgress");
 const gameLevelLabel = document.getElementById("gameLevel");
-let gameW = 0, gameH = 0, worldWidth = 0, gardenLevel = 1;
-let obstacles = [], baseObstacles = [], player = { x: 55, y: 0, radius: 7, speed: 45 };
-let cameraX = 0, targetY = 0, gameRunning = false, gameFrame = 0, lastFrame = 0;
-let gardenState = "intro", rafId = 0;
+let gameW = 0, gameH = 0, worldWidth = 0, worldHeight = 0, gardenLevel = 1;
+let obstacles = [], baseObstacles = [];
+let player = { x: 0, y: 0, radius: 7, speed: 185 };
+let cameraX = 0, cameraY = 0, targetX = 0, targetY = 0;
+let pointerGuiding = false, gameRunning = false, lastFrame = 0, rafId = 0;
+let gardenState = "intro";
+const heldKeys = new Set();
 
 function resizeGame() {
     const rect = gameCanvas.getBoundingClientRect();
@@ -930,34 +933,39 @@ function resizeGame() {
     gameCanvas.width = Math.round(gameW * dpr);
     gameCanvas.height = Math.round(gameH * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    if (!player.y) { player.y = gameH / 2; targetY = player.y; }
 }
 function generateGarden() {
-    worldWidth = gameW * 3.5;
+    worldWidth = gameW * 2.35;
+    worldHeight = gameH * 2.35;
     obstacles = [];
-    const amount = Math.min(170 + gardenLevel * 30, 400);
+    const amount = Math.min(260 + gardenLevel * 25, 400);
+    const exit = { x: worldWidth - 58, y: worldHeight - 58 };
     for (let i = 0; i < amount; i++) {
         let placed = false;
-        for (let attempt = 0; attempt < 120 && !placed; attempt++) {
+        for (let attempt = 0; attempt < 140 && !placed; attempt++) {
             const isCircle = Math.random() < .56;
-            const x = 150 + Math.random() * (worldWidth - 260);
-            const y = 35 + Math.random() * Math.max(40, gameH - 70);
+            const x = 75 + Math.random() * (worldWidth - 150);
+            const y = 75 + Math.random() * (worldHeight - 150);
+            // Keep the starting area and the exit clear.
+            if (Math.hypot(x - 55, y - gameH / 2) < 105 || Math.hypot(x - exit.x, y - exit.y) < 105) continue;
             const w = isCircle ? 0 : 24 + Math.random() * 19;
             const h = isCircle ? 0 : 18 + Math.random() * 14;
             const r = isCircle ? 11 + Math.random() * 8 : Math.max(w, h) * .58;
             const bound = isCircle ? r : Math.hypot(w / 2, h / 2);
-            if (obstacles.some(o => Math.hypot(o.x - x, o.y - y) < o.bound + bound + 5)) continue;
+            if (obstacles.some(o => Math.hypot(o.x - x, o.y - y) < o.bound + bound + 7)) continue;
             const speedScale = 1 + Math.min(gardenLevel - 1, 8) * .08;
             obstacles.push({ x, y, type: isCircle ? "circle" : "rect", r, w, h, bound,
-                vx: (Math.random() - .5) * 34 * speedScale,
-                vy: (Math.random() - .5) * 34 * speedScale,
+                vx: (Math.random() - .5) * 38 * speedScale,
+                vy: (Math.random() - .5) * 38 * speedScale,
                 angle: Math.random() * Math.PI * 2,
                 spin: (Math.random() - .5) * .9 });
             placed = true;
         }
     }
     baseObstacles = obstacles.map(o => ({ ...o }));
-    player.x = 55; player.y = gameH / 2; targetY = player.y; cameraX = 0;
+    player.x = 55; player.y = gameH / 2;
+    targetX = player.x; targetY = player.y;
+    cameraX = 0; cameraY = 0; pointerGuiding = false; heldKeys.clear();
     gameProgress.style.width = "0%";
     gameLevelLabel.textContent = "Garden " + gardenLevel;
 }
@@ -966,13 +974,14 @@ function openSpiritGame() {
     document.body.style.overflow = "hidden";
     resizeGame();
     gardenState = "intro";
-    cameraX = 0;
+    cameraX = 0; cameraY = 0;
     gameIntro.hidden = false; gameRetry.hidden = true; gameNext.hidden = true;
     gameRunning = false;
-    drawGarden(0);
+    drawGarden();
 }
 function closeSpiritGame() {
     gameRunning = false;
+    heldKeys.clear();
     cancelAnimationFrame(rafId);
     gameOverlay.classList.remove("open");
     document.body.style.overflow = "";
@@ -983,11 +992,9 @@ function startGarden(next = false) {
     if (next || obstacles.length === 0) generateGarden();
     else {
         obstacles = baseObstacles.map(o => ({ ...o }));
-        // Retry from the beginning of the same garden, not from the collision point.
-        player.x = 55;
-        player.y = gameH / 2;
-        targetY = player.y;
-        cameraX = 0;
+        player.x = 55; player.y = gameH / 2;
+        targetX = player.x; targetY = player.y;
+        cameraX = 0; cameraY = 0; pointerGuiding = false; heldKeys.clear();
         gameProgress.style.width = "0%";
     }
     gameIntro.hidden = true; gameRetry.hidden = true; gameNext.hidden = true;
@@ -996,22 +1003,33 @@ function startGarden(next = false) {
     cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(gameLoop);
 }
-function drawGarden(progress) {
+function drawGarden() {
     ctx.clearRect(0, 0, gameW, gameH);
     const gradient = ctx.createLinearGradient(0, 0, gameW, gameH);
     gradient.addColorStop(0, "#102e34"); gradient.addColorStop(1, "#071820");
     ctx.fillStyle = gradient; ctx.fillRect(0, 0, gameW, gameH);
-    // Distant soft lights
-    for (let i = 0; i < 24; i++) {
-        const x = ((i * 173 + 37) % gameW), y = ((i * 97 + 21) % gameH);
+    for (let i = 0; i < 32; i++) {
+        const x = ((i * 173 + 37 - cameraX * .16) % gameW + gameW) % gameW;
+        const y = ((i * 97 + 21 - cameraY * .16) % gameH + gameH) % gameH;
         ctx.beginPath(); ctx.arc(x, y, 1.2 + (i % 3), 0, Math.PI * 2);
         ctx.fillStyle = "rgba(191,231,190,.12)"; ctx.fill();
     }
-    const cam = gardenState === "intro" ? 0 : cameraX;
+    // The exit is in the far corner; the spirit can approach it from any direction.
+    const exitX = worldWidth - 58 - cameraX;
+    const exitY = worldHeight - 58 - cameraY;
+    if (exitX > -60 && exitX < gameW + 60 && exitY > -60 && exitY < gameH + 60) {
+        ctx.save(); ctx.translate(exitX, exitY);
+        ctx.shadowBlur = 24; ctx.shadowColor = "#b9e8bd";
+        ctx.strokeStyle = "rgba(210,248,211,.9)"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = "rgba(185,232,189,.35)"; ctx.lineWidth = 8;
+        ctx.beginPath(); ctx.arc(0, 0, 31, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+    }
     obstacles.forEach(o => {
-        const x = o.x - cam;
-        if (x < -70 || x > gameW + 70) return;
-        ctx.save(); ctx.translate(x, o.y); ctx.rotate(o.angle);
+        const x = o.x - cameraX, y = o.y - cameraY;
+        if (x < -70 || x > gameW + 70 || y < -70 || y > gameH + 70) return;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(o.angle);
         ctx.shadowBlur = 15; ctx.shadowColor = "rgba(161,226,178,.42)";
         ctx.fillStyle = o.type === "circle" ? "rgba(153,211,176,.7)" : "rgba(126,177,173,.65)";
         ctx.strokeStyle = "rgba(222,249,222,.55)"; ctx.lineWidth = 1;
@@ -1019,11 +1037,11 @@ function drawGarden(progress) {
         else { ctx.beginPath(); ctx.roundRect(-o.w/2, -o.h/2, o.w, o.h, 5); ctx.fill(); ctx.stroke(); }
         ctx.restore();
     });
-    const px = player.x - cam;
+    const px = player.x - cameraX, py = player.y - cameraY;
     ctx.save(); ctx.shadowBlur = 22; ctx.shadowColor = "#bcebd0";
-    ctx.fillStyle = "#d9f5e5"; ctx.beginPath(); ctx.arc(px, player.y, player.radius, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = "#d9f5e5"; ctx.beginPath(); ctx.arc(px, py, player.radius, 0, Math.PI*2); ctx.fill();
     ctx.shadowBlur = 0; ctx.fillStyle = "#527d78";
-    ctx.beginPath(); ctx.arc(px - 2.2, player.y - 1.3, 1, 0, Math.PI*2); ctx.arc(px + 2.2, player.y - 1.3, 1, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px - 2.2, py - 1.3, 1, 0, Math.PI*2); ctx.arc(px + 2.2, py - 1.3, 1, 0, Math.PI*2); ctx.fill();
     ctx.restore();
 }
 function collides(o) {
@@ -1042,37 +1060,70 @@ function gameLoop(now) {
     const speedScale = 1 + Math.min(gardenLevel - 1, 8) * .08;
     obstacles.forEach(o => {
         o.x += o.vx * dt; o.y += o.vy * dt; o.angle += o.spin * dt;
-        if (o.x < 90 || o.x > worldWidth - 90) o.vx *= -1;
-        if (o.y < 22 || o.y > gameH - 22) o.vy *= -1;
+        if (o.x < 35 || o.x > worldWidth - 35) o.vx *= -1;
+        if (o.y < 35 || o.y > worldHeight - 35) o.vy *= -1;
     });
-    const dy = targetY - player.y;
-    player.y += Math.sign(dy) * Math.min(Math.abs(dy), player.speed * speedScale * dt);
-    player.x += player.speed * speedScale * dt;
-    cameraX = Math.max(0, Math.min(worldWidth - gameW, player.x - gameW * .35));
-    gameProgress.style.width = Math.min(100, (player.x / worldWidth) * 100) + "%";
+    let vx = 0, vy = 0;
+    if (heldKeys.has("ArrowLeft") || heldKeys.has("a")) vx--;
+    if (heldKeys.has("ArrowRight") || heldKeys.has("d")) vx++;
+    if (heldKeys.has("ArrowUp") || heldKeys.has("w")) vy--;
+    if (heldKeys.has("ArrowDown") || heldKeys.has("s")) vy++;
+    if (vx || vy) {
+        const mag = Math.hypot(vx, vy);
+        player.x += (vx / mag) * player.speed * speedScale * dt;
+        player.y += (vy / mag) * player.speed * speedScale * dt;
+    } else if (pointerGuiding) {
+        const dx = targetX - player.x, dy = targetY - player.y;
+        const distance = Math.hypot(dx, dy);
+        const step = player.speed * speedScale * dt;
+        if (distance > 1) {
+            player.x += dx / distance * Math.min(distance, step);
+            player.y += dy / distance * Math.min(distance, step);
+        }
+    }
+    player.x = Math.max(player.radius, Math.min(worldWidth - player.radius, player.x));
+    player.y = Math.max(player.radius, Math.min(worldHeight - player.radius, player.y));
+    cameraX = Math.max(0, Math.min(worldWidth - gameW, player.x - gameW * .5));
+    cameraY = Math.max(0, Math.min(worldHeight - gameH, player.y - gameH * .5));
+    const exitDistance = Math.hypot((worldWidth - 58) - player.x, (worldHeight - 58) - player.y);
+    const startDistance = Math.hypot(worldWidth - 113, worldHeight - 58 - gameH / 2);
+    gameProgress.style.width = Math.max(0, Math.min(100, (1 - exitDistance / startDistance) * 100)) + "%";
     if (obstacles.some(collides)) {
         gameRunning = false; gardenState = "hit";
-        gameRetry.hidden = false; drawGarden(0); return;
+        gameRetry.hidden = false; drawGarden(); return;
     }
-    if (player.x >= worldWidth - 35) {
+    if (exitDistance < 29) {
         gameRunning = false; gardenState = "won";
-        gameNext.hidden = false; drawGarden(0); return;
+        gameNext.hidden = false; drawGarden(); return;
     }
-    drawGarden(0);
+    drawGarden();
     rafId = requestAnimationFrame(gameLoop);
 }
 function setGameTarget(event) {
     const rect = gameCanvas.getBoundingClientRect();
-    targetY = Math.max(18, Math.min(gameH - 18, event.clientY - rect.top));
+    targetX = Math.max(12, Math.min(worldWidth - 12, cameraX + event.clientX - rect.left));
+    targetY = Math.max(12, Math.min(worldHeight - 12, cameraY + event.clientY - rect.top));
+    pointerGuiding = true;
 }
-gameCanvas.addEventListener("pointermove", setGameTarget);
-gameCanvas.addEventListener("pointerdown", setGameTarget);
+gameCanvas.addEventListener("pointermove", event => { if (event.pointerType === "mouse" || event.buttons || event.pointerType === "touch") setGameTarget(event); });
+gameCanvas.addEventListener("pointerdown", event => { gameCanvas.setPointerCapture?.(event.pointerId); setGameTarget(event); });
+gameCanvas.addEventListener("pointerleave", event => { if (event.pointerType === "mouse") pointerGuiding = false; });
+document.addEventListener("keydown", event => {
+    if (!gameOverlay.classList.contains("open")) return;
+    const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d"].includes(key)) { heldKeys.add(key); event.preventDefault(); }
+    if (event.key === "Escape") closeSpiritGame();
+});
+document.addEventListener("keyup", event => {
+    const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    heldKeys.delete(key);
+});
+window.addEventListener("blur", () => heldKeys.clear());
 document.getElementById("gameStart").addEventListener("click", () => startGarden(false));
 document.getElementById("gameRetryButton").addEventListener("click", () => startGarden(false));
 document.getElementById("gameNextButton").addEventListener("click", () => startGarden(true));
 document.getElementById("gameClose").addEventListener("click", closeSpiritGame);
-document.addEventListener("keydown", event => { if (event.key === "Escape" && gameOverlay.classList.contains("open")) closeSpiritGame(); });
-window.addEventListener("resize", () => { if (gameOverlay.classList.contains("open")) { resizeGame(); if (gardenState !== "intro") drawGarden(0); } });
+window.addEventListener("resize", () => { if (gameOverlay.classList.contains("open")) { resizeGame(); if (gardenState !== "intro") drawGarden(); } });
 </script>
 </body>
 </html>
