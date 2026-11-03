@@ -384,36 +384,84 @@ footer {
     position: fixed;
     right: 28px;
     bottom: 22px;
-    width: 70px;
-    height: 78px;
-    z-index: 10;
-    pointer-events: none;
+    width: 92px;
+    height: 102px;
+    z-index: 20;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
     animation: spirit-float 4s ease-in-out infinite;
     filter: drop-shadow(0 8px 15px rgba(0,0,0,.2));
+    -webkit-tap-highlight-color: transparent;
 }
-
-#spirit svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-}
-
+#spirit:focus-visible { outline: 2px solid rgba(255,255,255,.8); outline-offset: 5px; border-radius: 45%; }
+#spirit svg { width: 100%; height: 100%; overflow: visible; }
 @keyframes spirit-float {
     0%, 100% { transform: translateY(0) rotate(-2deg); }
     50% { transform: translateY(-9px) rotate(2deg); }
 }
-
 .spirit-status {
     position: fixed;
-    right: 108px;
-    bottom: 34px;
-    z-index: 10;
+    right: 132px;
+    bottom: 39px;
+    z-index: 20;
     color: rgba(255,255,255,.65);
     font-size: 10px;
     letter-spacing: .5px;
     pointer-events: none;
 }
+.accessory { animation: grow-in 1.1s ease both; }
+@keyframes grow-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 
+/* Spirit Escape */
+#gameOverlay {
+    position: fixed; inset: 0; z-index: 1000; display: none;
+    align-items: center; justify-content: center; padding: 18px;
+    background: rgba(3, 13, 18, .72); backdrop-filter: blur(9px);
+    color: #edf8f1; overflow: auto;
+}
+#gameOverlay.open { display: flex; }
+.game-window {
+    position: relative; isolation: isolate; overflow: hidden;
+    width: min(820px, calc(100vw - 36px));
+    height: min(540px, calc(100vh - 36px));
+    min-height: 360px; border: 1px solid rgba(226,247,235,.2);
+    border-radius: 27px; background: radial-gradient(ellipse at 50% 35%, #183a3c 0%, #0b2027 58%, #07141d 100%);
+    box-shadow: 0 30px 100px rgba(0,0,0,.48);
+}
+#gameCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; z-index: 0; }
+.game-topbar { position: absolute; top: 16px; left: 20px; right: 20px; z-index: 5; display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
+.game-brand { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: rgba(226,247,235,.7); }
+#gameClose { pointer-events: auto; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.2); border-radius: 50%; color: white; background: rgba(255,255,255,.1); font-size: 23px; line-height: 1; }
+.game-progress-wrap { position: absolute; top: 68px; left: 20px; right: 20px; height: 3px; background: rgba(255,255,255,.13); border-radius: 10px; z-index: 3; }
+#gameProgress { height: 100%; width: 0%; background: #b9e8bd; border-radius: inherit; transition: width .15s linear; }
+#gameLevel { position: absolute; top: 80px; left: 20px; z-index: 3; color: rgba(226,247,235,.62); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+.game-card { position: absolute; z-index: 6; left: 50%; top: 50%; transform: translate(-50%,-50%); width: min(390px, calc(100% - 36px)); padding: 30px 28px; text-align: center; border: 1px solid rgba(226,247,235,.2); border-radius: 25px; background: rgba(10,29,34,.9); box-shadow: 0 25px 80px rgba(0,0,0,.3); pointer-events: auto; }
+.game-card[hidden] { display: none !important; }
+.game-card h2 { margin: 0 0 10px; font-size: 26px; font-weight: 500; letter-spacing: -.8px; }
+.game-card p { margin: 0 0 22px; color: rgba(226,247,235,.72); font-size: 13px; line-height: 1.6; }
+.game-action { position: relative; z-index: 7; pointer-events: auto; border: 1px solid rgba(222,247,227,.35); border-radius: 13px; padding: 12px 20px; color: #10251f; background: #c9e8c4; font-weight: 650; letter-spacing: .5px; font-size: 11px; }
+.game-hint { position: absolute; bottom: 16px; left: 0; right: 0; z-index: 3; text-align: center; color: rgba(226,247,235,.5); font-size: 10px; letter-spacing: .7px; pointer-events: none; }
+@media (max-width: 560px) {
+    #gameOverlay { padding: 10px; }
+    .game-window { width: calc(100vw - 20px); height: min(560px, calc(100vh - 20px)); min-height: 330px; border-radius: 20px; }
+    .game-topbar { left: 14px; right: 14px; top: 12px; }
+    .game-progress-wrap { left: 14px; right: 14px; top: 62px; }
+    #gameLevel { left: 14px; top: 74px; }
+    .game-hint { bottom: 12px; font-size: 9px; }
+}
+@media (max-width: 720px) {
+    .container { padding-top: 30px; }
+    .grid { grid-template-columns: 1fr; }
+    .notes-panel { grid-column: auto; }
+    header { margin-bottom: 30px; }
+    #spirit { width: 68px; height: 76px; right: 15px; bottom: 15px; }
+    .spirit-status { right: 92px; bottom: 27px; }
+}
 @media (max-width: 720px) {
     .container {
         padding-top: 30px;
@@ -431,17 +479,6 @@ footer {
         margin-bottom: 30px;
     }
 
-    #spirit {
-        width: 54px;
-        height: 60px;
-        right: 15px;
-        bottom: 15px;
-    }
-
-    .spirit-status {
-        right: 78px;
-        bottom: 27px;
-    }
 }
 
 @media (max-width: 420px) {
@@ -530,103 +567,50 @@ footer {
 </div>
 
 <div class="spirit-status" id="spiritStatus"></div>
-
-<div id="spirit">
-    <svg viewBox="0 0 140 155" xmlns="http://www.w3.org/2000/svg">
+<button id="spirit" type="button" aria-label="A little glass spirit" title="">
+    <svg viewBox="0 0 140 155" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
             <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#ffffff" stop-opacity=".95"/>
-                <stop offset="45%" stop-color="#dceaff" stop-opacity=".65"/>
-                <stop offset="100%" stop-color="#a8c6d9" stop-opacity=".45"/>
+                <stop offset="0%" stop-color="#e5f7ff" stop-opacity=".96"/>
+                <stop offset="45%" stop-color="#a8d9ed" stop-opacity=".78"/>
+                <stop offset="100%" stop-color="#6bafd0" stop-opacity=".88"/>
             </linearGradient>
-
             <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#a8df9d"/>
-                <stop offset="100%" stop-color="#438b69"/>
+                <stop offset="0%" stop-color="#c6ed9b"/><stop offset="55%" stop-color="#79c878"/><stop offset="100%" stop-color="#3e9367"/>
             </linearGradient>
-
             <linearGradient id="flower" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#fff2d5"/>
-                <stop offset="100%" stop-color="#e6b9db"/>
+                <stop offset="0%" stop-color="#fffef2"/><stop offset="100%" stop-color="#e8e4d6"/>
             </linearGradient>
-
-            <filter id="glow">
-                <feGaussianBlur stdDeviation="4" result="blur"/>
-                <feMerge>
-                    <feMergeNode in="blur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-            </filter>
+            <linearGradient id="starfish" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ffd7a9"/><stop offset="55%" stop-color="#f2a77e"/><stop offset="100%" stop-color="#d77d69"/>
+            </linearGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="6" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
-
-        <!-- Glass body -->
-        <path
-            d="M70 18
-               C40 18 22 43 23 83
-               C24 119 42 139 70 139
-               C98 139 116 119 117 83
-               C118 43 100 18 70 18Z"
-            fill="url(#glass)"
-            stroke="rgba(255,255,255,.9)"
-            stroke-width="2"
-            filter="url(#glow)"
-        />
-
-        <!-- Glass highlights -->
-        <path
-            d="M39 49 C43 34 53 28 63 27"
-            fill="none"
-            stroke="white"
-            stroke-width="4"
-            stroke-linecap="round"
-            opacity=".65"
-        />
-
-        <path
-            d="M31 80 C30 100 38 117 48 124"
-            fill="none"
-            stroke="white"
-            stroke-width="2"
-            stroke-linecap="round"
-            opacity=".35"
-        />
-
-        <!-- Face -->
-        <ellipse cx="53" cy="72" rx="4.5" ry="6" fill="#34444b"/>
-        <ellipse cx="87" cy="72" rx="4.5" ry="6" fill="#34444b"/>
-        <path
-            d="M65 86 Q70 91 75 86"
-            fill="none"
-            stroke="#52666b"
-            stroke-width="2.5"
-            stroke-linecap="round"
-        />
-
-        <!-- Starfish on the right eye -->
+        <path d="M70 18 C40 18 20 39 20 68 L20 103 C20 117 25 127 34 130 C43 133 49 126 53 119 C58 132 64 136 70 136 C77 136 83 130 87 119 C92 126 98 133 107 130 C116 127 120 117 120 103 L120 68 C120 39 100 18 70 18 Z" fill="#9ed5ed" opacity=".2" filter="url(#glow)"/>
+        <path d="M70 18 C40 18 20 39 20 68 L20 103 C20 117 25 127 34 130 C43 133 49 126 53 119 C58 132 64 136 70 136 C77 136 83 130 87 119 C92 126 98 133 107 130 C116 127 120 117 120 103 L120 68 C120 39 100 18 70 18 Z" fill="url(#glass)" stroke="rgba(255,255,255,.9)" stroke-width="1.5"/>
+        <ellipse cx="48" cy="48" rx="17" ry="24" fill="white" opacity=".12"/>
+        <path d="M30 76 Q35 40 61 25" fill="none" stroke="white" stroke-width="2" opacity=".35" stroke-linecap="round"/>
+        <circle cx="53" cy="72" r="3" fill="#355c73"/><circle cx="87" cy="72" r="3" fill="#355c73"/>
+        <ellipse cx="70" cy="86" rx="2.5" ry="2" fill="#355c73"/>
         <g transform="translate(87 65) rotate(12)">
-            <path
-                d="M0 -12
-                   L3 -4
-                   L11 -7
-                   L6 0
-                   L12 5
-                   L3 5
-                   L0 13
-                   L-3 5
-                   L-11 7
-                   L-6 0
-                   L-12 -5
-                   L-3 -5Z"
-                fill="#f2a879"
-                stroke="#fff0d9"
-                stroke-width="1.5"
-            />
-            <circle cx="0" cy="0" r="2" fill="#ffe8c6"/>
+            <path d="M0 -13 C3 -12 4 -7 5 -4 C8 -8 13 -9 14 -6 C15 -3 11 0 8 2 C13 4 15 8 12 10 C9 12 5 8 2 6 C2 11 -1 15 -4 13 C-7 11 -5 6 -5 3 C-10 5 -15 4 -15 1 C-15 -3 -9 -4 -6 -4 C-8 -9 -6 -13 -3 -13 C-1 -13 0 -10 0 -7 Z" fill="url(#starfish)" stroke="#d98770" stroke-width="1.2" stroke-linejoin="round"/>
+            <circle cx="-2" cy="-3" r="1.2" fill="#ffe8c6" opacity=".9"/><circle cx="4" cy="2" r="1" fill="#ffe8c6" opacity=".8"/><circle cx="-5" cy="5" r=".9" fill="#ffe8c6" opacity=".8"/>
         </g>
-
-        <!-- Accessory is inserted here -->
         <g id="accessory"></g>
     </svg>
+</button>
+
+<div id="gameOverlay" aria-label="Spirit Escape game" role="dialog" aria-modal="true">
+  <div class="game-window">
+    <canvas id="gameCanvas"></canvas>
+    <div class="game-topbar"><div class="game-brand">ELSEWHERE · SPIRIT ESCAPE</div><button id="gameClose" type="button" aria-label="Close game">×</button></div>
+    <div class="game-progress-wrap"><div id="gameProgress"></div></div>
+    <div id="gameLevel">Garden 1</div>
+    <div class="game-card" id="gameIntro"><h2>Spirit Escape</h2><p>Guide the little spirit through the garden. Avoid the drifting shapes and reach the far edge.</p><button type="button" class="game-action" id="gameStart">ENTER GARDEN</button></div>
+    <div class="game-card" id="gameRetry" hidden><h2>A little mishap</h2><p>The garden got the better of you. The same garden is waiting.</p><button type="button" class="game-action" id="gameRetryButton">TRY AGAIN</button></div>
+    <div class="game-card" id="gameNext" hidden><h2>Garden escaped</h2><p>A new garden is growing. This one will be a little busier.</p><button type="button" class="game-action" id="gameNextButton">NEXT GARDEN</button></div>
+    <div class="game-hint">MOVE YOUR POINTER OR FINGER TO GUIDE THE SPIRIT</div>
+  </div>
 </div>
 
 <script>
@@ -867,155 +851,228 @@ notes.addEventListener("input", function() {
 
 
 /* --------------------------------
-   LITTLE SPIRIT
+   LITTLE SPIRIT + SECRET GAME
 -------------------------------- */
-
 const accessory = document.getElementById("accessory");
 const spiritStatus = document.getElementById("spiritStatus");
+const spiritButton = document.getElementById("spirit");
 
 function bulb() {
-    return `
-        <g transform="translate(70 22)">
-            <path
-                d="M0 0 C-12 -10 -22 1 -18 13
-                   C-16 19 -10 21 -9 28
-                   L9 28
-                   C10 21 16 19 18 13
-                   C22 1 12 -10 0 0Z"
-                fill="#ffe8a6"
-                stroke="#fff4d1"
-                stroke-width="2"
-                filter="url(#glow)"
-            />
-            <path
-                d="M-8 29 L8 29 M-7 34 L7 34 M-5 39 L5 39"
-                stroke="#d5b77e"
-                stroke-width="3"
-                stroke-linecap="round"
-            />
-            <path
-                d="M0 -9 L0 -16 M-23 1 L-29 -3 M23 1 L29 -3"
-                stroke="#ffe8a6"
-                stroke-width="2"
-                stroke-linecap="round"
-            />
-        </g>
-    `;
+    return `<g class="accessory" transform="translate(70 22)">
+        <path d="M0 0 C-12 -10 -22 1 -18 13 C-16 19 -10 21 -9 28 L9 28 C10 21 16 19 18 13 C22 1 12 -10 0 0Z" fill="#ffe8a6" stroke="#fff4d1" stroke-width="2" filter="url(#glow)"/>
+        <path d="M-8 29 L8 29 M-7 34 L7 34 M-5 39 L5 39" stroke="#d5b77e" stroke-width="3" stroke-linecap="round"/>
+        <path d="M0 -9 L0 -16 M-23 1 L-29 -3 M23 1 L29 -3" stroke="#ffe8a6" stroke-width="2" stroke-linecap="round"/>
+    </g>`;
 }
-
 function sprout() {
-    return `
-        <g transform="translate(70 18)">
-            <path
-                d="M0 30 Q0 7 0 -5"
-                stroke="#6a9d67"
-                stroke-width="4"
-                stroke-linecap="round"
-                fill="none"
-            />
-            <path
-                d="M0 11 C-25 8 -29 -13 -8 -17
-                   C2 -12 4 0 0 11Z"
-                fill="url(#green)"
-                stroke="#c5e8a9"
-                stroke-width="1.5"
-            />
-            <path
-                d="M0 3 C14 -20 33 -11 27 4
-                   C20 17 7 17 0 11Z"
-                fill="#8fbd81"
-                stroke="#d0edb5"
-                stroke-width="1.5"
-            />
-            <path
-                d="M-15 -9 Q-7 -5 0 11 M22 -5 Q12 1 0 11"
-                fill="none"
-                stroke="#d9efc5"
-                stroke-width="1.5"
-            />
-        </g>
-    `;
+    return `<g class="accessory" transform="translate(70 6)">
+        <path d="M0 30 Q0 7 0 -5" stroke="#6a9d67" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M0 11 C-25 8 -29 -13 -8 -17 C2 -12 4 0 0 11Z" fill="url(#green)" stroke="#c5e8a9" stroke-width="1.5"/>
+        <path d="M0 3 C14 -20 33 -11 27 4 C20 17 7 17 0 11Z" fill="#8fbd81" stroke="#d0edb5" stroke-width="1.5"/>
+        <path d="M-15 -9 Q-7 -5 0 11 M22 -5 Q12 1 0 11" fill="none" stroke="#d9efc5" stroke-width="1.5"/>
+    </g>`;
 }
-
 function queenOfTheNight() {
-    return `
-        <g transform="translate(70 22)" filter="url(#glow)">
-            <path
-                d="M0 14
-                   C-25 12 -29 -9 -12 -14
-                   C-8 -27 7 -25 12 -14
-                   C30 -11 25 12 0 14Z"
-                fill="url(#flower)"
-                stroke="#fff1ed"
-                stroke-width="1.5"
-            />
-            <path
-                d="M0 14
-                   C-10 0 -22 -2 -19 -15
-                   C-7 -18 0 -7 0 14Z"
-                fill="#f8d9e9"
-                stroke="#fff1ed"
-                stroke-width="1"
-            />
-            <path
-                d="M0 14
-                   C10 0 22 -2 19 -15
-                   C7 -18 0 -7 0 14Z"
-                fill="#f1c9e4"
-                stroke="#fff1ed"
-                stroke-width="1"
-            />
-            <circle cx="0" cy="5" r="5" fill="#f7d58c"/>
-            <path
-                d="M0 19 Q0 31 0 38"
-                stroke="#78a777"
-                stroke-width="3"
-                fill="none"
-                stroke-linecap="round"
-            />
-            <path
-                d="M0 29 Q-15 18 -19 29 Q-9 36 0 29Z"
-                fill="#77a978"
-            />
-        </g>
-    `;
+    return `<g class="accessory" transform="translate(70 22)" filter="url(#glow)">
+        <path d="M0 14 C-25 12 -29 -9 -12 -14 C-8 -27 7 -25 12 -14 C30 -11 25 12 0 14Z" fill="url(#flower)" stroke="#fff1ed" stroke-width="1.5"/>
+        <path d="M0 14 C-10 0 -22 -2 -19 -15 C-7 -18 0 -7 0 14Z" fill="#f8f2e4" stroke="#fff1ed" stroke-width="1"/>
+        <path d="M0 14 C10 0 22 -2 19 -15 C7 -18 0 -7 0 14Z" fill="#eee8dc" stroke="#fff1ed" stroke-width="1"/>
+        <circle cx="0" cy="5" r="5" fill="#f7d58c"/>
+        <path d="M0 19 Q0 31 0 38" stroke="#78a777" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M0 29 Q-15 18 -19 29 Q-9 36 0 29Z" fill="#77a978"/>
+    </g>`;
 }
-
 let currentAccessory = "";
-
 function updateAccessory() {
     const hour = new Date().getHours();
-    let nextAccessory;
-    let status;
-
-    if (hour >= 0 && hour < 6) {
-        nextAccessory = "bulb";
-        status = "Resting";
-    } else if (hour >= 6 && hour < 13) {
-        nextAccessory = "sprout";
-        status = "Growing";
-    } else {
-        nextAccessory = "flower";
-        status = "In bloom";
-    }
-
+    const nextAccessory = hour < 6 ? "bulb" : hour < 13 ? "sprout" : "flower";
+    const status = nextAccessory === "bulb" ? "Resting" : nextAccessory === "sprout" ? "Growing" : "In bloom";
     if (nextAccessory === currentAccessory) return;
-
     currentAccessory = nextAccessory;
-
-    if (nextAccessory === "bulb") {
-        accessory.innerHTML = bulb();
-    } else if (nextAccessory === "sprout") {
-        accessory.innerHTML = sprout();
-    } else {
-        accessory.innerHTML = queenOfTheNight();
-    }
-
+    accessory.innerHTML = nextAccessory === "bulb" ? bulb() : nextAccessory === "sprout" ? sprout() : queenOfTheNight();
     spiritStatus.textContent = status;
 }
-
 updateAccessory();
 setInterval(updateAccessory, 60000);
+
+// The spirit's secret click count is randomised each time the page loads.
+let secretClicks = 0;
+let secretTarget = Math.floor(Math.random() * 8) + 5;
+spiritButton.addEventListener("click", () => {
+    secretClicks++;
+    if (secretClicks >= secretTarget) {
+        secretClicks = 0;
+        secretTarget = Math.floor(Math.random() * 8) + 5;
+        openSpiritGame();
+    }
+});
+
+/* --------------------------------
+   SPIRIT ESCAPE GAME
+-------------------------------- */
+const gameOverlay = document.getElementById("gameOverlay");
+const gameCanvas = document.getElementById("gameCanvas");
+const ctx = gameCanvas.getContext("2d");
+const gameIntro = document.getElementById("gameIntro");
+const gameRetry = document.getElementById("gameRetry");
+const gameNext = document.getElementById("gameNext");
+const gameProgress = document.getElementById("gameProgress");
+const gameLevelLabel = document.getElementById("gameLevel");
+let gameW = 0, gameH = 0, worldWidth = 0, gardenLevel = 1;
+let obstacles = [], baseObstacles = [], player = { x: 55, y: 0, radius: 7, speed: 45 };
+let cameraX = 0, targetY = 0, gameRunning = false, gameFrame = 0, lastFrame = 0;
+let gardenState = "intro", rafId = 0;
+
+function resizeGame() {
+    const rect = gameCanvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    gameW = Math.max(1, rect.width); gameH = Math.max(1, rect.height);
+    gameCanvas.width = Math.round(gameW * dpr);
+    gameCanvas.height = Math.round(gameH * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (!player.y) { player.y = gameH / 2; targetY = player.y; }
+}
+function generateGarden() {
+    worldWidth = gameW * 3.5;
+    obstacles = [];
+    const amount = Math.min(170 + gardenLevel * 30, 400);
+    for (let i = 0; i < amount; i++) {
+        let placed = false;
+        for (let attempt = 0; attempt < 120 && !placed; attempt++) {
+            const isCircle = Math.random() < .56;
+            const x = 150 + Math.random() * (worldWidth - 260);
+            const y = 35 + Math.random() * Math.max(40, gameH - 70);
+            const w = isCircle ? 0 : 24 + Math.random() * 19;
+            const h = isCircle ? 0 : 18 + Math.random() * 14;
+            const r = isCircle ? 11 + Math.random() * 8 : Math.max(w, h) * .58;
+            const bound = isCircle ? r : Math.hypot(w / 2, h / 2);
+            if (obstacles.some(o => Math.hypot(o.x - x, o.y - y) < o.bound + bound + 5)) continue;
+            const speedScale = 1 + Math.min(gardenLevel - 1, 8) * .08;
+            obstacles.push({ x, y, type: isCircle ? "circle" : "rect", r, w, h, bound,
+                vx: (Math.random() - .5) * 34 * speedScale,
+                vy: (Math.random() - .5) * 34 * speedScale,
+                angle: Math.random() * Math.PI * 2,
+                spin: (Math.random() - .5) * .9 });
+            placed = true;
+        }
+    }
+    baseObstacles = obstacles.map(o => ({ ...o }));
+    player.x = 55; player.y = gameH / 2; targetY = player.y; cameraX = 0;
+    gameProgress.style.width = "0%";
+    gameLevelLabel.textContent = "Garden " + gardenLevel;
+}
+function openSpiritGame() {
+    gameOverlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+    resizeGame();
+    gardenState = "intro";
+    cameraX = 0;
+    gameIntro.hidden = false; gameRetry.hidden = true; gameNext.hidden = true;
+    gameRunning = false;
+    drawGarden(0);
+}
+function closeSpiritGame() {
+    gameRunning = false;
+    cancelAnimationFrame(rafId);
+    gameOverlay.classList.remove("open");
+    document.body.style.overflow = "";
+}
+function startGarden(next = false) {
+    if (next) gardenLevel++;
+    resizeGame();
+    if (next || obstacles.length === 0) generateGarden();
+    else {
+        obstacles = baseObstacles.map(o => ({ ...o }));
+        // Retry from the beginning of the same garden, not from the collision point.
+        player.x = 55;
+        player.y = gameH / 2;
+        targetY = player.y;
+        cameraX = 0;
+        gameProgress.style.width = "0%";
+    }
+    gameIntro.hidden = true; gameRetry.hidden = true; gameNext.hidden = true;
+    gardenState = "playing"; gameRunning = true;
+    lastFrame = performance.now();
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(gameLoop);
+}
+function drawGarden(progress) {
+    ctx.clearRect(0, 0, gameW, gameH);
+    const gradient = ctx.createLinearGradient(0, 0, gameW, gameH);
+    gradient.addColorStop(0, "#102e34"); gradient.addColorStop(1, "#071820");
+    ctx.fillStyle = gradient; ctx.fillRect(0, 0, gameW, gameH);
+    // Distant soft lights
+    for (let i = 0; i < 24; i++) {
+        const x = ((i * 173 + 37) % gameW), y = ((i * 97 + 21) % gameH);
+        ctx.beginPath(); ctx.arc(x, y, 1.2 + (i % 3), 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(191,231,190,.12)"; ctx.fill();
+    }
+    const cam = gardenState === "intro" ? 0 : cameraX;
+    obstacles.forEach(o => {
+        const x = o.x - cam;
+        if (x < -70 || x > gameW + 70) return;
+        ctx.save(); ctx.translate(x, o.y); ctx.rotate(o.angle);
+        ctx.shadowBlur = 15; ctx.shadowColor = "rgba(161,226,178,.42)";
+        ctx.fillStyle = o.type === "circle" ? "rgba(153,211,176,.7)" : "rgba(126,177,173,.65)";
+        ctx.strokeStyle = "rgba(222,249,222,.55)"; ctx.lineWidth = 1;
+        if (o.type === "circle") { ctx.beginPath(); ctx.arc(0, 0, o.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }
+        else { ctx.beginPath(); ctx.roundRect(-o.w/2, -o.h/2, o.w, o.h, 5); ctx.fill(); ctx.stroke(); }
+        ctx.restore();
+    });
+    const px = player.x - cam;
+    ctx.save(); ctx.shadowBlur = 22; ctx.shadowColor = "#bcebd0";
+    ctx.fillStyle = "#d9f5e5"; ctx.beginPath(); ctx.arc(px, player.y, player.radius, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0; ctx.fillStyle = "#527d78";
+    ctx.beginPath(); ctx.arc(px - 2.2, player.y - 1.3, 1, 0, Math.PI*2); ctx.arc(px + 2.2, player.y - 1.3, 1, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+}
+function collides(o) {
+    const dx = player.x - o.x, dy = player.y - o.y;
+    if (Math.hypot(dx, dy) > player.radius + o.bound) return false;
+    if (o.type === "circle") return Math.hypot(dx, dy) < player.radius + o.r;
+    const c = Math.cos(-o.angle), s = Math.sin(-o.angle);
+    const rx = dx * c - dy * s, ry = dx * s + dy * c;
+    const nearX = Math.max(-o.w/2, Math.min(o.w/2, rx));
+    const nearY = Math.max(-o.h/2, Math.min(o.h/2, ry));
+    return Math.hypot(rx - nearX, ry - nearY) < player.radius;
+}
+function gameLoop(now) {
+    if (!gameRunning) return;
+    const dt = Math.min((now - lastFrame) / 1000, .035); lastFrame = now;
+    const speedScale = 1 + Math.min(gardenLevel - 1, 8) * .08;
+    obstacles.forEach(o => {
+        o.x += o.vx * dt; o.y += o.vy * dt; o.angle += o.spin * dt;
+        if (o.x < 90 || o.x > worldWidth - 90) o.vx *= -1;
+        if (o.y < 22 || o.y > gameH - 22) o.vy *= -1;
+    });
+    const dy = targetY - player.y;
+    player.y += Math.sign(dy) * Math.min(Math.abs(dy), player.speed * speedScale * dt);
+    player.x += player.speed * speedScale * dt;
+    cameraX = Math.max(0, Math.min(worldWidth - gameW, player.x - gameW * .35));
+    gameProgress.style.width = Math.min(100, (player.x / worldWidth) * 100) + "%";
+    if (obstacles.some(collides)) {
+        gameRunning = false; gardenState = "hit";
+        gameRetry.hidden = false; drawGarden(0); return;
+    }
+    if (player.x >= worldWidth - 35) {
+        gameRunning = false; gardenState = "won";
+        gameNext.hidden = false; drawGarden(0); return;
+    }
+    drawGarden(0);
+    rafId = requestAnimationFrame(gameLoop);
+}
+function setGameTarget(event) {
+    const rect = gameCanvas.getBoundingClientRect();
+    targetY = Math.max(18, Math.min(gameH - 18, event.clientY - rect.top));
+}
+gameCanvas.addEventListener("pointermove", setGameTarget);
+gameCanvas.addEventListener("pointerdown", setGameTarget);
+document.getElementById("gameStart").addEventListener("click", () => startGarden(false));
+document.getElementById("gameRetryButton").addEventListener("click", () => startGarden(false));
+document.getElementById("gameNextButton").addEventListener("click", () => startGarden(true));
+document.getElementById("gameClose").addEventListener("click", closeSpiritGame);
+document.addEventListener("keydown", event => { if (event.key === "Escape" && gameOverlay.classList.contains("open")) closeSpiritGame(); });
+window.addEventListener("resize", () => { if (gameOverlay.classList.contains("open")) { resizeGame(); if (gardenState !== "intro") drawGarden(0); } });
 </script>
 </body>
 </html>
